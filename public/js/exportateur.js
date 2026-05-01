@@ -125,20 +125,20 @@ const exportateur = {
 
             await new Promise(r => setTimeout(r, 1000));
             document.getElementById('proc-1').querySelector('i').className = 'done';
-            document.getElementById('proc-status').innerText = "Contrôle Qualité OK";
+            document.getElementById('proc-status').innerText = "Validation Qualité...";
             
             await new Promise(r => setTimeout(r, 1000));
             document.getElementById('proc-2').querySelector('i').setAttribute('data-lucide', 'check-circle');
             document.getElementById('proc-2').querySelector('i').className = 'done';
             document.getElementById('proc-status').innerText = "Scellage en cours...";
             app.refreshIcons();
-
+ 
             await new Promise(r => setTimeout(r, 1000));
             document.getElementById('proc-3').querySelector('i').setAttribute('data-lucide', 'check-circle');
             document.getElementById('proc-3').querySelector('i').className = 'done';
-            document.getElementById('proc-status').innerText = "Douanes validées";
+            document.getElementById('proc-status').innerText = "Vérification Douanes...";
             app.refreshIcons();
-
+ 
             for (const id of ids) {
                 const user = auth.currentUser || { id: 'EXP-001' };
                 const lot = await database.getLot(id);
@@ -161,11 +161,11 @@ const exportateur = {
                     }
                 });
             }
-
+ 
             await new Promise(r => setTimeout(r, 1000));
             document.getElementById('proc-4').querySelector('i').setAttribute('data-lucide', 'check-circle');
             document.getElementById('proc-4').querySelector('i').className = 'done';
-            document.getElementById('proc-status').innerText = "PRÊT POUR EMBARQUEMENT";
+            document.getElementById('proc-status').innerText = "Finalisation...";
             app.refreshIcons();
 
             setTimeout(() => {

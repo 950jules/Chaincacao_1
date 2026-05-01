@@ -50,7 +50,7 @@ const auth = {
                 <div id="register-form" class="auth-form hidden">
                     <div class="input-group">
                         <label>Je suis un :</label>
-                        <select id="reg-role">
+                        <select id="reg-role" onchange="auth.toggleVerifierFields()">
                             <option value="AGR">Agriculteur</option>
                             <option value="COOP">Coopérative</option>
                             <option value="EXP">Exportateur</option>
@@ -67,7 +67,7 @@ const auth = {
                             <input type="text" id="reg-firstname" placeholder="Prénom">
                         </div>
                     </div>
-                    <div class="input-group">
+                    <div class="input-group" id="locality-group">
                         <label>Localité</label>
                         <select id="reg-locality">
                             ${utils.REGIONS.map(r => `<option value="${r}">${r}</option>`).join('')}
@@ -79,7 +79,7 @@ const auth = {
                             <input type="number" id="reg-age" placeholder="Ex: 35">
                         </div>
                         <div class="input-group">
-                            <label>Mobile (+228)</label>
+                            <label id="label-phone">Mobile (+228)</label>
                             <input type="tel" id="reg-phone" placeholder="90123456">
                         </div>
                     </div>
@@ -106,6 +106,20 @@ const auth = {
         document.getElementById('register-form').classList.toggle('hidden', tab !== 'register');
     },
 
+    toggleVerifierFields() {
+        const role = document.getElementById('reg-role').value;
+        const locGroup = document.getElementById('locality-group');
+        const phoneLabel = document.getElementById('label-phone');
+        
+        if (role === 'VER') {
+            locGroup.style.display = 'none';
+            phoneLabel.innerText = "Téléphone Professionnel";
+        } else {
+            locGroup.style.display = 'block';
+            phoneLabel.innerText = "Mobile (+228)";
+        }
+    },
+
     async login() {
         const id = document.getElementById('login-id').value.toUpperCase().trim();
         const pass = document.getElementById('login-pass').value;
@@ -125,7 +139,11 @@ const auth = {
             }
         } catch (e) {
             console.error("Login Error", e);
-            alert("Identifiant ou mot de passe incorrect");
+            if (e.code === 'auth/operation-not-allowed') {
+                alert("ERREUR CONFIGURATION : Vous devez activer la méthode 'E-mail/Mot de passe' dans votre console Firebase (Onglet Authentication > Sign-in method).");
+            } else {
+                alert("Identifiant ou mot de passe incorrect");
+            }
         }
     },
 
@@ -133,7 +151,7 @@ const auth = {
         const role = document.getElementById('reg-role').value;
         const last = document.getElementById('reg-lastname').value.trim();
         const first = document.getElementById('reg-firstname').value.trim();
-        const loc = document.getElementById('reg-locality').value;
+        const loc = role === 'VER' ? 'Global' : document.getElementById('reg-locality').value;
         const age = document.getElementById('reg-age').value;
         const phone = document.getElementById('reg-phone').value.trim();
         const pass = document.getElementById('reg-pass').value;
@@ -171,7 +189,11 @@ const auth = {
             this.handleSuccess(newUser);
         } catch (e) {
             console.error("Register Error", e);
-            alert("Erreur lors de l'inscription : " + e.message);
+            if (e.code === 'auth/operation-not-allowed') {
+                alert("ERREUR CONFIGURATION : Vous devez activer la méthode 'E-mail/Mot de passe' dans votre console Firebase (Onglet Authentication > Sign-in method).");
+            } else {
+                alert("Erreur lors de l'inscription : " + e.message);
+            }
         }
     },
 
