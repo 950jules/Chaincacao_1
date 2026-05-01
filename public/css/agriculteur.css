@@ -21,7 +21,7 @@
 .location-badge {
     width: 40px;
     height: 40px;
-    background: rgba(56, 142, 60, 0.2);
+    background: rgba(45, 90, 39, 0.2);
     color: var(--success);
     border-radius: 50%;
     display: flex;
@@ -46,8 +46,8 @@
     border: 1px solid rgba(0,0,0,0.05);
 }
 
-.status-mini.yellow { background: #FFF9C4; color: #FBC02D; }
-.status-mini.green { background: rgba(56, 142, 60, 0.15); color: var(--success); }
+.status-mini.yellow { background: #FFF9C4; color: #D35400; }
+.status-mini.green { background: rgba(45, 90, 39, 0.15); color: var(--success); }
 .status-mini.red { background: #FFCDD2; color: var(--danger); }
 
 .status-mini .val { font-weight: 900; font-size: 1.1rem; }
@@ -136,9 +136,9 @@
 .photo-preview {
     width: 100%;
     height: 280px;
-    background: rgba(61, 26, 10, 0.03);
+    background: rgba(61, 27, 11, 0.03);
     border-radius: 24px;
-    border: 2px dashed rgba(61, 26, 10, 0.15);
+    border: 2px dashed rgba(61, 27, 11, 0.15);
     display: flex;
     align-items: center;
     justify-content: center;

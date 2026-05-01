@@ -1,36 +1,20 @@
-# ChainCacao - Traçabilité du Cacao du Togo
+<div align="center">
+<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
+</div>
 
-ChainCacao est une solution technologique de pointe conçue pour assurer la traçabilité complète du cacao togolais, en conformité avec les réglementations internationales (EUDR). L'application utilise la technologie Blockchain et le QR Code pour relier chaque sac de cacao à sa parcelle d'origine.
+# Run and deploy your AI Studio app
 
-## 🚀 Fonctionnalités Clés
+This contains everything you need to run your app locally.
 
--   **PWA (Progressive Web App) :** Fonctionne hors-ligne dans les zones rurales reculées.
--   **Traçabilité Blockchain :** Chaque transaction est enregistrée sur Polygon pour une immuabilité totale.
--   **Preuves EUDR :** Capture automatique des coordonnées GPS et photos lors de la récolte.
--   **Interface Multi-Acteurs :**
-    -   🧑‍🌾 **Agriculteur :** Déclaration des lots, capture GPS et QR Code.
-    -   🤝 **Coopérative :** Pesée officielle, contrôle qualité et scellage.
-    -   🚢 **Exportateur :** Gestion des manifests, contrôle phytosanitaire et douanes.
-    -   🔍 **Vérificateur :** Audit public de la chaîne de traçabilité.
+View your app in AI Studio: https://ai.studio/apps/9f533733-bd79-49db-97ba-3503bcaf4462
 
-## 🖥️ Portails
+## Run Locally
 
--   **Application Principale :** Gestion de la chaîne par les acteurs (Agriculteurs, Coopératives, Exportateurs).
--   **Portail de Vérification Public :** `/verifier/index.html` - Permet au grand public ou aux régulateurs de vérifier un ID de lot sans connexion.
+**Prerequisites:**  Node.js
 
-## 🛠️ Architecture Technique
 
--   **Frontend :** Vanilla JS (ES6+), CSS Grid/Flexbox (Vibe Design).
--   **Base de données :** IndexedDB (via `idb` library) pour le support offline.
--   **Blockchain :** Simulation de smart contracts sur réseau Polygon.
--   **Cartographie :** Leaflet.js pour la visualisation des parcelles.
--   **QR Code :** qrcode.js pour la génération d'identifiants uniques.
-
-## 📦 Installation
-
-1. Clonez le dépôt.
-2. Ouvrez `index.html` via un serveur local (Live Server, etc.).
-3. Pour la PWA, assurez-vous d'utiliser `https` ou `localhost`.
-
----
-*Développé pour l'excellence et la transparence de la filière Cacao.*
+1. Install dependencies:
+   `npm install`
+2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
+3. Run the app:
+   `npm run dev`

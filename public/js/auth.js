@@ -2,28 +2,15 @@ const auth = {
     currentUser: null,
 
     async init() {
-        console.log("Auth init starting...");
-        // Sign in anonymously to satisfy security rules
-        // Non-blocking call
-        if (window.firebase) {
-            firebase.auth().signInAnonymously()
-                .then(() => console.log("Firebase Auth: Signed in anonymously"))
-                .catch(e => console.error("Firebase Auth Error (Silenced):", e));
-        }
-
         this.currentUser = JSON.parse(localStorage.getItem('chaincacao_user'));
         if (this.currentUser) {
-            console.log("User found in localStorage:", this.currentUser.id);
             app.initUserSession(this.currentUser);
         } else {
-            console.log("No user found, showing auth screen");
             this.showAuthScreen();
         }
     },
 
     showAuthScreen() {
-        if (document.getElementById('auth-screen')) return;
-        
         const appEl = document.getElementById('app');
         const authContainer = document.createElement('div');
         authContainer.id = 'auth-screen';
@@ -36,8 +23,8 @@ const auth = {
                 </div>
                 
                 <div class="auth-tabs">
-                    <button id="tab-login" class="active">Connexion</button>
-                    <button id="tab-register">Inscription</button>
+                    <button id="tab-login" class="active" onclick="auth.switchTab('login')">Connexion</button>
+                    <button id="tab-register" onclick="auth.switchTab('register')">Inscription</button>
                 </div>
 
                 <div id="login-form" class="auth-form">
@@ -49,14 +36,13 @@ const auth = {
                         <label>Mot de passe</label>
                         <input type="password" id="login-pass" placeholder="••••••••">
                     </div>
-                    <div id="auth-msg" class="auth-status-msg"></div>
-                    <button class="btn btn-primary" id="btn-login-submit">SE CONNECTER</button>
+                    <button class="btn btn-primary" onclick="auth.login()">SE CONNECTER</button>
                 </div>
 
                 <div id="register-form" class="auth-form hidden">
                     <div class="input-group">
                         <label>Je suis un :</label>
-                        <select id="reg-role">
+                        <select id="reg-role" onchange="auth.updatePrefix()">
                             <option value="AGR">Agriculteur</option>
                             <option value="COOP">Coopérative</option>
                             <option value="EXP">Exportateur</option>
@@ -103,27 +89,12 @@ const auth = {
                         <label>Confirmer le mot de passe</label>
                         <input type="password" id="reg-pass-confirm" placeholder="••••••••">
                     </div>
-                    <button class="btn btn-primary" id="btn-register-submit" style="margin-top:10px">S'INSCRIRE</button>
+                    <button class="btn btn-primary" onclick="auth.register()" style="margin-top:10px">S'INSCRIRE</button>
                 </div>
             </div>
         `;
         document.body.appendChild(authContainer);
         appEl.classList.add('blurred');
-
-        // Attach Event Listeners
-        const tLogin = document.getElementById('tab-login');
-        const tReg = document.getElementById('tab-register');
-        const bLogin = document.getElementById('btn-login-submit');
-        const bReg = document.getElementById('btn-register-submit');
-        const roleSel = document.getElementById('reg-role');
-
-        if (tLogin) tLogin.onclick = () => this.switchTab('login');
-        if (tReg) tReg.onclick = () => this.switchTab('register');
-        if (bLogin) bLogin.onclick = () => this.login();
-        if (bReg) bReg.onclick = () => this.register();
-        if (roleSel) roleSel.onchange = () => this.updatePrefix();
-        
-        console.log("Auth listeners attached");
     },
 
     switchTab(tab) {
@@ -134,115 +105,48 @@ const auth = {
     },
 
     async login() {
-        console.log("Click detected: login");
-        const btn = document.getElementById('btn-login-submit');
-        const msg = document.getElementById('auth-msg');
-        if (!btn) return;
-        const originalText = btn.innerText;
-        
-        try {
-            msg.innerText = "Vérification de l'identité...";
-            msg.style.color = "#8D5B3E";
-            btn.innerText = "CONNEXION...";
-            btn.disabled = true;
+        const id = document.getElementById('login-id').value;
+        const pass = document.getElementById('login-pass').value;
 
-            const id = document.getElementById('login-id').value.trim();
-            const pass = document.getElementById('login-pass').value;
+        const users = await database.getUsers() || [];
+        const user = users.find(u => u.id === id && u.password === pass);
 
-            if (!id || !pass) throw new Error("Veuillez remplir tous les champs");
-
-            // Timeout for database
-            const usersPromise = database.getUsers();
-            const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error("Délai de connexion dépassé. Vérifiez votre réseau.")), 15000));
-            
-            const usersList = await Promise.race([usersPromise, timeoutPromise]) || [];
-            const user = usersList.find(u => u.id === id && u.password === pass);
-
-            if (user) {
-                msg.innerText = "Succès ! Redirection...";
-                msg.style.color = "#388E3C";
-                setTimeout(() => this.handleSuccess(user), 500);
-            } else {
-                throw new Error("Identifiant ou mot de passe incorrect");
-            }
-        } catch (e) {
-            console.error("Login Error:", e);
-            msg.innerText = e.message;
-            msg.style.color = "#D32F2F";
-        } finally {
-            btn.innerText = originalText;
-            btn.disabled = false;
+        if (user) {
+            this.handleSuccess(user);
+        } else {
+            alert("Identifiant ou mot de passe incorrect");
         }
     },
 
     async register() {
-        console.log("Click detected: register");
-        const btn = document.getElementById('btn-register-submit');
-        const msg = document.getElementById('auth-msg'); // Using same msg area if visible or adding to reg
-        if (!btn) return;
-        const originalText = btn.innerText;
+        const role = document.getElementById('reg-role').value;
+        const last = document.getElementById('reg-lastname').value;
+        const first = document.getElementById('reg-firstname').value;
+        const locality = document.getElementById('reg-locality').value;
+        const age = document.getElementById('reg-age').value;
+        const phone = document.getElementById('reg-phone').value;
+        const pass = document.getElementById('reg-pass').value;
+        const passConfirm = document.getElementById('reg-pass-confirm').value;
 
-        try {
-            console.log("Register attempt...");
-            if (msg) {
-                msg.innerText = "Création du compte...";
-                msg.style.color = "#8D5B3E";
-            }
-            btn.innerText = "INSCRIPTION...";
-            btn.disabled = true;
+        if (!phone || phone.length < 8) return alert("Numéro de téléphone invalide");
+        if (pass.length < 8) return alert("Le mot de passe doit faire au moins 8 caractères");
+        if (pass !== passConfirm) return alert("Les mots de passe ne correspondent pas");
 
-            const role = document.getElementById('reg-role').value;
-            const last = document.getElementById('reg-lastname').value.trim();
-            const first = document.getElementById('reg-firstname').value.trim();
-            const locality = document.getElementById('reg-locality').value;
-            const age = document.getElementById('reg-age').value;
-            const phone = document.getElementById('reg-phone').value.trim();
-            const pass = document.getElementById('reg-pass').value;
-            const passConfirm = document.getElementById('reg-pass-confirm').value;
+        const userId = `${role}-${phone}`;
+        const newUser = {
+            id: userId,
+            role,
+            lastname: last,
+            firstname: first,
+            locality,
+            age,
+            phone,
+            password: pass
+        };
 
-            if (!last || !first || !phone || !pass) throw new Error("Tous les champs sont obligatoires");
-            if (phone.length < 8) throw new Error("Numéro de téléphone invalide (8 chiffres min)");
-            if (pass.length < 8) throw new Error("Le mot de passe doit faire au moins 8 caractères");
-            if (pass !== passConfirm) throw new Error("Les mots de passe ne correspondent pas");
-
-            const userId = `${role}-${phone}`;
-            
-            // Check existence
-            const allUsers = await database.getUsers() || [];
-            if (allUsers.some(u => u.id === userId)) {
-                throw new Error("Cet identifiant (téléphone) est déjà utilisé");
-            }
-
-            const newUser = {
-                id: userId,
-                role,
-                lastname: last,
-                firstname: first,
-                locality,
-                age,
-                phone,
-                password: pass,
-                createdAt: new Date().toISOString()
-            };
-
-            await database.saveUser(newUser);
-            if (msg) {
-                msg.innerText = "Compte créé ! Connexion...";
-                msg.style.color = "#388E3C";
-            }
-            setTimeout(() => this.handleSuccess(newUser), 1000);
-        } catch (e) {
-            console.error("Register Error:", e);
-            if (msg) {
-                msg.innerText = e.message;
-                msg.style.color = "#D32F2F";
-            } else {
-                alert(e.message);
-            }
-        } finally {
-            btn.innerText = originalText;
-            btn.disabled = false;
-        }
+        await database.saveUser(newUser);
+        alert(`Inscription réussie ! Votre identifiant est : ${userId}`);
+        this.handleSuccess(newUser);
     },
 
     handleSuccess(user) {
@@ -256,13 +160,5 @@ const auth = {
     logout() {
         localStorage.removeItem('chaincacao_user');
         location.reload();
-    },
-
-    updatePrefix() {
-        const role = document.getElementById('reg-role').value;
-        const idDisplay = document.querySelector('label[for="reg-phone"]') || { innerText: "" };
-        console.log("Role changed to:", role);
     }
 };
-
-window.auth = auth;

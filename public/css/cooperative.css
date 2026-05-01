@@ -3,7 +3,7 @@
     border-radius: 28px;
     overflow: hidden;
     margin-bottom: 1.5rem;
-    border: 3px dashed rgba(61, 26, 10, 0.2);
+    border: 3px dashed rgba(61, 27, 11, 0.2);
     aspect-ratio: 1;
 }
 
@@ -15,11 +15,11 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background: rgba(56, 142, 60, 0.1);
+    background: rgba(45, 90, 39, 0.1);
     padding: 1rem;
     border-radius: 16px;
     margin: 1.5rem 0;
-    border: 1px solid rgba(56, 142, 60, 0.2);
+    border: 1px solid rgba(45, 90, 39, 0.2);
 }
 
 .weight-diff {
@@ -30,7 +30,7 @@
 }
 
 .weight-diff.gap-ok { color: var(--success); }
-.weight-diff.gap-warning { color: #F57F17; }
+.weight-diff.gap-warning { color: #D35400; }
 .weight-diff.gap-danger { color: var(--danger); }
 
 .grade-toggles {
@@ -43,7 +43,7 @@
 .grade-btn {
     padding: 0.75rem 0.25rem;
     background: var(--white);
-    border: 1.5px solid rgba(61, 26, 10, 0.1);
+    border: 1.5px solid rgba(61, 27, 11, 0.1);
     border-radius: 12px;
     font-size: 0.7rem;
     font-weight: 800;

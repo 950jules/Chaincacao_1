@@ -1,44 +1,17 @@
 const app = {
     async init() {
-        // Failsafe: if after 10s we haven't loaded, force reveal the app
-        setTimeout(() => {
-            if (!document.body.classList.contains('loaded')) {
-                console.warn("Failsafe: Forced load triggered after timeout");
-                this.setLoaded();
-            }
-        }, 8000);
-
         try {
-            console.log("ChainCacao starting (Version Firebase)...");
+            console.log("ChainCacao starting...");
             await database.init();
             offline.init();
-            await auth.init();
+            auth.init();
             
             this.setupNavigation();
             this.setupPWAInstall();
             this.refreshIcons();
-            console.log("ChainCacao initialized successfully");
-            this.setLoaded();
         } catch (error) {
             console.error("App init error:", error);
-            this.showInitError(error);
         }
-    },
-
-    showInitError(error) {
-        document.body.innerHTML = `
-            <div style="padding: 40px; text-align: center; font-family: sans-serif; color: #D32F2F;">
-                <h1 style="font-size: 2.5rem; margin-bottom: 20px;">Erreur d'initialisation</h1>
-                <p style="font-size: 1.2rem; color: #333; margin-bottom: 30px;">
-                    Une erreur technique empêche le démarrage de l'application.<br>
-                    <small style="color: #666;">${error.message || error}</small>
-                </p>
-                <button onclick="location.reload()" style="padding: 12px 24px; font-size: 1rem; cursor: pointer; border-radius: 8px; border: none; background: #eee;">Réessayer</button>
-                <div style="margin-top: 40px; padding: 20px; border: 1px dashed #ccc; font-size: 0.8rem; color: #666;">
-                    <strong>Conseil technique :</strong> Si l'erreur persiste, videz le cache de votre navigateur ou essayez de naviguer en mode privé.
-                </div>
-            </div>
-        `;
     },
 
     initUserSession(user) {
@@ -196,6 +169,7 @@ const app = {
 };
 
 window.onload = () => {
-    console.log("Window loaded, starting app...");
-    app.init();
+    app.init().then(() => {
+        app.setLoaded();
+    });
 };

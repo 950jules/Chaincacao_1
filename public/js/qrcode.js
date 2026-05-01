@@ -6,7 +6,7 @@ const qrcodeControl = {
             text: data,
             width: 200,
             height: 200,
-            colorDark: "#5C3A21",
+            colorDark: "#3D1B0B",
             colorLight: "#ffffff"
         });
     },

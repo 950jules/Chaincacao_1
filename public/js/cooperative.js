@@ -164,8 +164,8 @@ const cooperative = {
                 box.style.borderColor = 'rgba(251, 192, 43, 0.3)';
             } else {
                 gap.style.color = 'var(--success)';
-                box.style.background = 'rgba(56, 142, 60, 0.1)';
-                box.style.borderColor = 'rgba(56, 142, 60, 0.3)';
+                box.style.background = 'rgba(137, 187, 7, 0.1)';
+                box.style.borderColor = 'rgba(137, 187, 7, 0.3)';
             }
         };
     },
@@ -223,7 +223,7 @@ const cooperative = {
 
     async renderHistory() {
         const user = JSON.parse(localStorage.getItem('chaincacao_user')) || { id: 'COOP-001' };
-        const transfers = await database.getAllTransfers();
+        const transfers = await idb.openDB(DB_NAME, DB_VERSION).then(db => db.getAll('transfers'));
         const coopTransfers = transfers.filter(t => t.actorId === user.id).reverse();
         
         const container = document.getElementById('cooperative-history');

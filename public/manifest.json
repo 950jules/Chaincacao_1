@@ -3,8 +3,8 @@
   "short_name": "ChainCacao",
   "start_url": "./index.html",
   "display": "standalone",
-  "background_color": "#F5EFE6",
-  "theme_color": "#3D1A0A",
+  "background_color": "#FDF8F3",
+  "theme_color": "#3D1B0B",
   "description": "Traçabilité blockchain pour la filière cacao.",
   "icons": [
     {

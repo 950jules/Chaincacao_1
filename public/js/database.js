@@ -1,143 +1,67 @@
-// Firebase Configuration (from firebase-applet-config.json)
-const firebaseConfig = {
-    projectId: "gen-lang-client-0846821407",
-    appId: "1:692923259240:web:ab1f1cb49bbb19b8d81edd",
-    apiKey: "AIzaSyCIuyy15SbpaSLmy1s8ntz-WlOqaQ4PwvA",
-    authDomain: "gen-lang-client-0846821407.firebaseapp.com",
-    storageBucket: "gen-lang-client-0846821407.firebasestorage.app",
-    messagingSenderId: "692923259240",
-    firestoreDatabaseId: "ai-studio-9f533733-bd79-49db-97ba-3503bcaf4462"
-};
+const DB_NAME = 'ChainCacaoDB';
+const DB_VERSION = 2;
 
 let db;
 
 const database = {
     async init() {
-        if (!window.firebase) {
-            console.error("Firebase SDK non chargé");
-            throw new Error("SDK Firebase manquant");
-        }
-
-        try {
-            // Check if app is already initialized
-            let app;
-            if (firebase.apps.length === 0) {
-                app = firebase.initializeApp(firebaseConfig);
-                console.log("Firebase App initialisée");
-            } else {
-                app = firebase.app();
+        db = await idb.openDB(DB_NAME, DB_VERSION, {
+            upgrade(db) {
+                if (!db.objectStoreNames.contains('lots')) {
+                    db.createObjectStore('lots', { keyPath: 'id' });
+                }
+                if (!db.objectStoreNames.contains('transfers')) {
+                    const store = db.createObjectStore('transfers', { keyPath: 'id', autoIncrement: true });
+                    store.createIndex('by-lot', 'lotId');
+                }
+                if (!db.objectStoreNames.contains('actors')) {
+                    db.createObjectStore('actors', { keyPath: 'id' });
+                }
+                if (!db.objectStoreNames.contains('users')) {
+                    db.createObjectStore('users', { keyPath: 'id' });
+                }
+                if (!db.objectStoreNames.contains('settings')) {
+                    db.createObjectStore('settings', { keyPath: 'key' });
+                }
             }
+        });
 
-            // Use the specific Database ID if provided, otherwise default
-            if (firebaseConfig.firestoreDatabaseId) {
-                console.log("Tentative d'accès à la DB:", firebaseConfig.firestoreDatabaseId);
-                db = app.firestore(firebaseConfig.firestoreDatabaseId);
-            } else {
-                db = app.firestore();
-            }
-
-            console.log("Firestore ready");
-        } catch (e) {
-            console.error("Firestore init failed:", e);
-            throw e;
-        }
+        await this.seedIfNeeded();
     },
 
-    // Error handler mandatory for security rule debugging
-    handleError(error, operation, path) {
-        const errInfo = {
-            error: error.message || String(error),
-            operationType: operation, // 'create', 'update', 'delete', 'list', 'get', 'write'
-            path: path,
-            authInfo: {
-                userId: null // We'll add auth later
-            }
-        };
-        console.error('Firestore Error: ', JSON.stringify(errInfo));
-        throw new Error(JSON.stringify(errInfo));
+    async seedIfNeeded() {
+        // ... (existing seed code if any)
     },
 
     async saveUser(user) {
-        try {
-            await db.collection('users').doc(user.id).set(user);
-        } catch (e) {
-            this.handleError(e, 'write', 'users/' + user.id);
-        }
+        return db.put('users', user);
     },
 
     async getUsers() {
-        try {
-            const snapshot = await db.collection('users').get();
-            return snapshot.docs.map(doc => doc.data());
-        } catch (e) {
-            this.handleError(e, 'list', 'users');
-        }
+        return db.getAll('users');
     },
 
     async addLot(lot) {
-        try {
-            await db.collection('lots').doc(lot.id).set(lot);
-        } catch (e) {
-            this.handleError(e, 'create', 'lots/' + lot.id);
-        }
+        return db.add('lots', lot);
     },
 
     async getLot(id) {
-        try {
-            const doc = await db.collection('lots').doc(id).get();
-            return doc.exists ? doc.data() : null;
-        } catch (e) {
-            this.handleError(e, 'get', 'lots/' + id);
-        }
+        return db.get('lots', id);
     },
 
     async updateLot(lot) {
-        try {
-            await db.collection('lots').doc(lot.id).set(lot, { merge: true });
-        } catch (e) {
-            this.handleError(e, 'update', 'lots/' + lot.id);
-        }
+        return db.put('lots', lot);
     },
 
     async getAllLots() {
-        try {
-            const snapshot = await db.collection('lots').get();
-            return snapshot.docs.map(doc => doc.data());
-        } catch (e) {
-            this.handleError(e, 'list', 'lots');
-        }
+        return db.getAll('lots');
     },
 
     async addTransfer(transfer) {
-        try {
-            // Firestore doesn't have auto-increment. We use document ID or timestamp.
-            const id = transfer.id || `trans_${Date.now()}`;
-            await db.collection('transfers').doc(id).set({ ...transfer, id });
-        } catch (e) {
-            this.handleError(e, 'create', 'transfers');
-        }
-    },
-
-    async getAllTransfers() {
-        try {
-            const snapshot = await db.collection('transfers').get();
-            return snapshot.docs.map(doc => doc.data());
-        } catch (e) {
-            this.handleError(e, 'list', 'transfers');
-        }
+        return db.add('transfers', transfer);
     },
 
     async getTransfersByLot(lotId) {
-        try {
-            const snapshot = await db.collection('transfers').where('lotId', '==', lotId).get();
-            return snapshot.docs.map(doc => doc.data()).sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
-        } catch (e) {
-            this.handleError(e, 'list', 'transfers');
-        }
-    },
-
-    async clearAllData() {
-        // En Firebase, on évite de tout vider à chaque fois, mais pour un bouton "clear" :
-        console.warn("ClearAllData non implémenté pour Firebase pour éviter les destructions accidentelles.");
+        return db.getAllFromIndex('transfers', 'by-lot', lotId);
     }
 };

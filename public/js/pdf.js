@@ -7,7 +7,7 @@ const pdfControl = {
         const doc = new jsPDF();
         
         // Header
-        doc.setFillColor(61, 26, 10); // Espresso #3D1A0A
+        doc.setFillColor(61, 27, 11); // Espresso #3D1B0B
         doc.rect(0, 0, 210, 40, 'F');
         
         doc.setTextColor(255, 255, 255);
@@ -16,7 +16,7 @@ const pdfControl = {
         doc.text("CHAINCACAO • CERTIFICAT", 20, 25);
         
         // Body
-        doc.setTextColor(61, 26, 10);
+        doc.setTextColor(61, 27, 11);
         doc.setFontSize(10);
         doc.text("DOCUMENT OFFICIEL DE TRAÇABILITÉ BLOCKCHAIN", 20, 50);
         
@@ -31,15 +31,15 @@ const pdfControl = {
         doc.text(`POIDS FINAL : ${lot.weight} KG`, 20, 96);
         
         // EUDR Status
-        doc.setDrawColor(45, 90, 27); // Forest Green
+        doc.setDrawColor(45, 90, 39); // Forest Green
         doc.setLineWidth(0.5);
         doc.rect(20, 105, 170, 15);
-        doc.setTextColor(45, 90, 27);
+        doc.setTextColor(45, 90, 39);
         doc.setFont("helvetica", "bold");
         doc.text("STATUT EUDR : CONFORME (ZÉRO DÉFORESTATION)", 25, 115);
         
         // Timeline
-        doc.setTextColor(61, 26, 10);
+        doc.setTextColor(61, 27, 11);
         doc.setFontSize(12);
         doc.text("HISTORIQUE DES TRANSACTIONS BLOCKCHAIN", 20, 135);
         
@@ -54,9 +54,9 @@ const pdfControl = {
             doc.setFontSize(9);
             doc.text(`Acteur: ${tx.actorId} • Date: ${utils.formatDate(tx.timestamp)}`, 25, y + 5);
             doc.setFontSize(7);
-            doc.setTextColor(139, 115, 85); // Secondary #8B7355
+            doc.setTextColor(93, 64, 55); // Secondary brown #5D4037
             doc.text(`TX HASH: ${tx.hash}`, 25, y + 10);
-            doc.setTextColor(61, 26, 10);
+            doc.setTextColor(61, 27, 11);
             doc.setFontSize(10);
             y += 20;
         });
