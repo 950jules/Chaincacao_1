@@ -1,0 +1,83 @@
+#reader {
+    width: 100%;
+    border-radius: 28px;
+    overflow: hidden;
+    margin-bottom: 1.5rem;
+    border: 3px dashed rgba(61, 26, 10, 0.2);
+    aspect-ratio: 1;
+}
+
+.coop-lot-card {
+    border-left: 6px solid var(--primary);
+}
+
+.weight-comparison {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(45, 90, 27, 0.05);
+    padding: 1.25rem;
+    border-radius: 16px;
+    margin: 2rem 0;
+    border: 1px solid rgba(45, 90, 27, 0.1);
+}
+
+.weight-diff {
+    font-weight: 800;
+    font-family: var(--font-heading);
+    color: var(--success);
+    font-size: 1.1rem;
+}
+
+.grade-toggles {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 0.5rem;
+    margin: 1.5rem 0;
+}
+
+.grade-btn {
+    padding: 0.75rem 0.25rem;
+    background: var(--white);
+    border: 1.5px solid rgba(61, 26, 10, 0.1);
+    border-radius: 12px;
+    font-size: 0.7rem;
+    font-weight: 800;
+    font-family: var(--font-heading);
+    text-transform: uppercase;
+    color: var(--secondary);
+    transition: all 0.2s;
+}
+
+.grade-btn.active {
+    background: var(--primary);
+    color: white;
+    border-color: var(--primary);
+}
+
+.history-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.25rem;
+    background: var(--white);
+    border-radius: 16px;
+    margin-bottom: 0.75rem;
+    box-shadow: var(--shadow);
+}
+
+.history-info .id {
+    font-weight: 800;
+    font-size: 0.9rem;
+    color: var(--primary);
+    font-family: var(--font-heading);
+}
+
+.history-info .date {
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: var(--secondary);
+    font-family: var(--font-heading);
+    margin-top: 2px;
+}

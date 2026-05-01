@@ -1,0 +1,205 @@
+const agriculteur = {
+    async renderDashboard() {
+        const lots = await database.getAllLots();
+        const totalWeight = lots.reduce((acc, lot) => acc + lot.weight, 0);
+        
+        const container = document.getElementById('agriculteur-dashboard');
+        container.innerHTML = `
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <span class="l">Total Semaine</span>
+                    <span class="v">${totalWeight.toFixed(1)}kg</span>
+                </div>
+                <div class="stat-item">
+                    <span class="l">Lots Actifs</span>
+                    <span class="v">${lots.length}</span>
+                </div>
+            </div>
+            <button class="btn btn-primary" id="btn-new-lot">🚜 NOUVEAU LOT</button>
+            <h3 style="margin: 2rem 0 1rem; font-family:var(--font-heading); font-size: 1rem; font-weight: 800;">Historique des récoltes</h3>
+            <div id="agri-lot-list">
+                ${lots.reverse().map(lot => `
+                    <div class="card" onclick="agriculteur.showDetails('${lot.id}')" style="cursor:pointer">
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 0.5rem">
+                            <strong style="font-family:var(--font-heading); font-weight:800; color:var(--primary)">${lot.id}</strong>
+                            <span class="badge ${lot.status === 'CREATED' ? 'badge-warning' : 'badge-success'}">${lot.status === 'CREATED' ? 'Nouveau' : 'Validé'}</span>
+                        </div>
+                        <div style="font-size:0.8rem; color:var(--secondary); font-weight: 600;">${utils.formatDate(lot.timestamp)} - ${lot.weight}kg</div>
+                    </div>
+                `).join('')}
+            </div>
+        `;
+
+        document.getElementById('btn-new-lot').onclick = () => this.showForm();
+    },
+
+    showForm() {
+        document.getElementById('agriculteur-dashboard').classList.add('hidden');
+        document.getElementById('agriculteur-form-container').classList.remove('hidden');
+        this.renderFormStep(1);
+    },
+
+    formState: { step: 1, data: {} },
+
+    renderFormStep(step) {
+        const container = document.getElementById('agriculteur-form-container');
+        this.formState.step = step;
+
+        let content = '';
+        if (step === 1) {
+            content = `
+                <h3>Étape 1: Détails du lot</h3>
+                <div class="input-group">
+                    <label>Poids estimé (kg)</label>
+                    <input type="number" id="f-weight" value="${this.formState.data.weight || ''}">
+                </div>
+                <div class="input-group">
+                    <label>Espèce</label>
+                    <select id="f-species">
+                        ${utils.SPECIES.map(s => `<option ${this.formState.data.species === s ?'selected':''}>${s}</option>`).join('')}
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label>Région de récolte</label>
+                    <select id="f-region">
+                        ${utils.REGIONS.map(r => `<option ${this.formState.data.region === r ?'selected':''}>${r}</option>`).join('')}
+                    </select>
+                </div>
+                <div class="action-bar">
+                    <button class="btn btn-outline" onclick="agriculteur.cancelForm()">Annuler</button>
+                    <button class="btn btn-primary" onclick="agriculteur.nextStep(2)">Suivant</button>
+                </div>
+            `;
+        } else if (step === 2) {
+            content = `
+                <h3>Étape 2: Preuves terrain</h3>
+                <div class="photo-preview" id="f-photo-preview">
+                    ${this.formState.data.photo ? `<img src="${this.formState.data.photo}">` : '<span>Pas de photo</span>'}
+                </div>
+                <button class="btn btn-outline" style="background:rgba(212,163,115,0.1); border:1px solid var(--primary); color:var(--primary)" onclick="agriculteur.takePhoto()">📸 PRENDRE PHOTO SAC</button>
+                
+                <div id="mini-map" class="mini-map-container" style="display:none"></div>
+                <div id="f-gps-display" style="margin-top:0.5rem"></div>
+
+                <button class="btn btn-primary" id="btn-gps-capture" onclick="agriculteur.getGps()">📍 CAPTURER POSITION GPS</button>
+                
+                <div class="action-bar">
+                    <button class="btn btn-outline" onclick="agriculteur.renderFormStep(1)">Retour</button>
+                    <button class="btn btn-primary" onclick="agriculteur.nextStep(3)">Valider</button>
+                </div>
+            `;
+        }
+ else if (step === 3) {
+            content = `
+                <div class="qr-result">
+                    <div class="badge badge-success">Succès ! Lot enregistré</div>
+                    <h2>Lot: ${this.formState.data.id}</h2>
+                    <div id="qrcode-display"></div>
+                    <button class="btn btn-primary" style="margin-top:2rem" onclick="agriculteur.cancelForm()">Retour au dashboard</button>
+                </div>
+            `;
+        }
+
+        container.innerHTML = `<div class="form-step">${content}</div>`;
+        if (step === 3) {
+            qrcodeControl.generate('qrcode-display', this.formState.data.id);
+        }
+    },
+
+    async nextStep(next) {
+        if (this.formState.step === 1) {
+            const weight = parseFloat(document.getElementById('f-weight').value);
+            if (!utils.isValidWeight(weight)) return alert("Poids invalide");
+            this.formState.data.weight = weight;
+            this.formState.data.species = document.getElementById('f-species').value;
+            this.formState.data.region = document.getElementById('f-region').value;
+        }
+        if (this.formState.step === 2 && next === 3) {
+            if (!this.formState.data.gps) return alert("GPS requis");
+            await this.saveLot();
+        }
+        this.renderFormStep(next);
+    },
+
+    async takePhoto() {
+        const photo = await camera.capturePhoto();
+        this.formState.data.photo = photo;
+        this.renderFormStep(2);
+    },
+
+    async getGps() {
+        const btn = document.getElementById('btn-gps-capture');
+        const display = document.getElementById('f-gps-display');
+        
+        btn.disabled = true;
+        btn.innerHTML = `<span class="spinner"></span> CAPTURE EN COURS...`;
+        
+        try {
+            const pos = await window.ChainCacaoGPS.getCurrentPosition();
+            this.formState.data.gps = pos;
+            
+            display.innerHTML = `
+                <div class="gps-success">
+                    ✅ POSITION CAPTURÉE<br>
+                    <small>${pos.lat.toFixed(5)}°, ${pos.lng.toFixed(5)}°</small>
+                </div>
+            `;
+            
+            window.ChainCacaoGPS.displayMiniMap('mini-map', pos.lat, pos.lng);
+            
+        } catch (e) { 
+            display.innerHTML = `<div class="gps-error">❌ ${e.message}</div>`;
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = `📍 RE-CAPTURER POSITION`;
+        }
+    },
+
+    async saveLot() {
+        const id = utils.generateId(this.formState.data.region);
+        const now = new Date();
+        const lot = {
+            id: id,
+            farmerId: 'ACT-001',
+            farmerName: 'Jean Coulibaly',
+            timestamp: now,
+            weight: this.formState.data.weight,
+            species: this.formState.data.species,
+            region: this.formState.data.region,
+            gps: this.formState.data.gps,
+            photo: this.formState.data.photo,
+            status: 'CREATED'
+        };
+        await database.addLot(lot);
+        
+        const tx = await blockchain.simulateTransaction(lot, 'ACT-001');
+        await database.addTransfer({
+            lotId: id,
+            actorId: 'ACT-001',
+            type: 'CREATION',
+            timestamp: now,
+            hash: tx.hash,
+            data: { weight: lot.weight, network: tx.network, block: tx.blockNumber }
+        });
+
+        this.formState.data.id = id;
+    },
+
+    cancelForm() {
+        this.formState = { step: 1, data: {} };
+        document.getElementById('agriculteur-dashboard').classList.remove('hidden');
+        document.getElementById('agriculteur-form-container').classList.add('hidden');
+        this.renderDashboard();
+    },
+
+    async showDetails(id) {
+        const lot = await database.getLot(id);
+        app.showModal(`
+            <h3>Détails Lot ${lot.id}</h3>
+            <p><strong>Poids:</strong> ${lot.weight}kg</p>
+            <p><strong>Statut:</strong> ${lot.status}</p>
+            <div id="qr-detail-box" style="text-align:center; margin:1rem"></div>
+        `);
+        qrcodeControl.generate('qr-detail-box', lot.id);
+    }
+};

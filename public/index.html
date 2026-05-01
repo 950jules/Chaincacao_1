@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ChainCacao - Traçabilité Transparente</title>
+    <meta name="theme-color" content="#3D1A0A">
+    <link rel="manifest" href="./manifest.json">
+    <link rel="apple-touch-icon" href="./images/icons/icon-192x192.png">
+
+    <!-- Splash Screen Styles -->
+    <style>
+        #splash-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #F5EFE6;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 99999;
+            transition: opacity 0.5s;
+        }
+        .splash-logo {
+            width: 80px;
+            height: 80px;
+            background: #3D1A0A;
+            border-radius: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(61,26,10,0.2);
+            color: white;
+        }
+        .splash-loader {
+            width: 40px;
+            height: 4px;
+            background: #E8E2D9;
+            border-radius: 2px;
+            overflow: hidden;
+            position: relative;
+        }
+        .splash-loader::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: #3D1A0A;
+            animation: loading 1.5s infinite;
+        }
+        @keyframes loading {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+        body.loaded #splash-screen {
+            opacity: 0;
+            pointer-events: none;
+        }
+    </style>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Sora:wght@100..800&display=swap" rel="stylesheet">
+    
+    <!-- CDNs -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/idb@8/build/umd.js" defer></script>
+    <script src="https://unpkg.com/html5-qrcode" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/motion/dist/motion.js" defer></script>
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="./css/style.css">
+    <link rel="stylesheet" href="./css/gps.css">
+    <link rel="stylesheet" href="./css/agriculteur.css">
+    <link rel="stylesheet" href="./css/cooperative.css">
+    <link rel="stylesheet" href="./css/exportateur.css">
+    <link rel="stylesheet" href="./css/verificateur.css">
+</head>
+<body>
+    <div id="splash-screen">
+        <div class="splash-logo">C</div>
+        <div class="splash-loader"></div>
+    </div>
+    <div id="app">
+        <!-- Header -->
+        <header class="app-header">
+            <div class="logo">
+                <div class="logo-icon-box">C</div>
+                <div class="logo-text">
+                    <h1>ChainCacao</h1>
+                    <div class="logo-tagline">Traçabilité Blockchain Temps Réel</div>
+                </div>
+            </div>
+            <div id="connection-status" class="status-badge online">Mode Hors-Ligne Prêt</div>
+        </header>
+
+        <!-- Main Content (Containers) -->
+        <main id="main-content">
+            <!-- Écran Agriculteur -->
+            <section id="screen-agriculteur" class="screen active">
+                <span class="section-label">01. Agriculteur</span>
+                <div id="agriculteur-dashboard"></div>
+                <div id="agriculteur-form-container" class="hidden"></div>
+            </section>
+
+            <!-- Écran Coopérative -->
+            <section id="screen-cooperative" class="screen hidden">
+                <span class="section-label">02. Coopérative</span>
+                <div id="cooperative-scanner"></div>
+                <div id="cooperative-details" class="hidden"></div>
+                <div id="cooperative-history"></div>
+            </section>
+
+            <!-- Écran Exportateur -->
+            <section id="screen-exportateur" class="screen hidden">
+                <span class="section-label">03. Exportateur</span>
+                <div id="exportateur-dashboard"></div>
+                <div id="exportateur-arrival-list"></div>
+            </section>
+
+            <!-- Écran Vérificateur -->
+            <section id="screen-verificateur" class="screen hidden">
+                <span class="section-label">04. Vérificateur</span>
+                <div class="search-box">
+                    <input type="text" id="verify-input" placeholder="Scanner ou saisir ID Lot...">
+                    <button id="btn-verify">Vérifier</button>
+                </div>
+                <div id="verifier-result" class="hidden"></div>
+            </section>
+        </main>
+
+        <!-- Navigation -->
+        <nav class="app-nav">
+            <button class="nav-item active" data-screen="agriculteur">
+                <span class="icon">🚜</span>
+                <span class="label">Récolte</span>
+            </button>
+            <button class="nav-item" data-screen="cooperative">
+                <span class="icon">🏭</span>
+                <span class="label">Collecte</span>
+            </button>
+            <button class="nav-item" data-screen="exportateur">
+                <span class="icon">🚛</span>
+                <span class="label">Export</span>
+            </button>
+            <button class="nav-item" data-screen="verificateur">
+                <span class="icon">🔍</span>
+                <span class="label">VÉRIFICATEUR</span>
+            </button>
+        </nav>
+
+        <!-- Modals / Overlays -->
+        <div id="modal-container" class="modal-overlay hidden">
+            <div class="modal-content">
+                <button class="close-modal">&times;</button>
+                <div id="modal-body"></div>
+            </div>
+        </div>
+
+        <!-- Offline Banner -->
+        <div id="offline-banner" class="hidden">Mode hors-ligne activé. Les données seront synchronisées plus tard.</div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="./js/utils.js" defer></script>
+    <script src="./js/database.js" defer></script>
+    <script src="./js/blockchain.js" defer></script>
+    <script src="./js/gps.js" defer></script>
+    <script src="./js/camera.js" defer></script>
+    <script src="./js/qrcode.js" defer></script>
+    <script src="./js/pdf.js" defer></script>
+    <script src="./js/agriculteur.js" defer></script>
+    <script src="./js/cooperative.js" defer></script>
+    <script src="./js/exportateur.js" defer></script>
+    <script src="./js/verificateur.js" defer></script>
+    <script src="./js/offline.js" defer></script>
+    <script src="./js/demo.js" defer></script>
+    <script src="./js/app.js" defer></script>
+</body>
+</html>

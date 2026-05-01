@@ -1,0 +1,141 @@
+/* Conteneur de carte */
+.map-container {
+    width: 100%;
+    height: 300px;
+    border-radius: 20px;
+    overflow: hidden;
+    margin: 15px 0;
+    border: 1px solid rgba(212, 163, 115, 0.2);
+    box-shadow: var(--shadow);
+}
+
+.mini-map-container {
+    width: 100%;
+    height: 180px;
+    border-radius: 16px;
+    overflow: hidden;
+    margin: 15px 0;
+    border: 1px solid rgba(212, 163, 115, 0.1);
+}
+
+/* Bouton GPS */
+.gps-button {
+    background-color: var(--primary);
+    color: white;
+    padding: 1.1rem;
+    border: none;
+    border-radius: 100px;
+    font-size: 0.9rem;
+    font-weight: 800;
+    font-family: var(--font-heading);
+    width: 100%;
+    margin: 10px 0;
+    cursor: pointer;
+    transition: all 0.2s;
+    letter-spacing: 0.05em;
+    box-shadow: 0 10px 20px rgba(212, 163, 115, 0.2);
+}
+
+.gps-button:active {
+    transform: scale(0.98);
+}
+
+.gps-button:disabled {
+    background-color: var(--gray);
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* Affichage position */
+.gps-success {
+    background-color: rgba(107, 142, 35, 0.2);
+    color: var(--success);
+    padding: 1rem;
+    border-radius: 16px;
+    text-align: center;
+    margin: 10px 0;
+    font-size: 0.85rem;
+    font-weight: 600;
+    border: 1px solid var(--success);
+}
+
+.gps-error {
+    background-color: rgba(232, 93, 51, 0.2);
+    color: var(--accent);
+    padding: 1rem;
+    border-radius: 16px;
+    text-align: center;
+    margin: 10px 0;
+    font-size: 0.85rem;
+    font-weight: 600;
+    border: 1px solid var(--accent);
+}
+
+.warning-badge {
+    background-color: #F57C00;
+    color: white;
+    padding: 10px;
+    border-radius: 8px;
+    font-size: 14px;
+    text-align: center;
+    margin: 10px 0;
+}
+
+/* Coordonnées affichées */
+.coordinates-display {
+    background-color: var(--bg-card);
+    padding: 10px;
+    border-radius: 8px;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    text-align: center;
+    border: 1px solid rgba(212, 163, 115, 0.1);
+}
+
+/* Spinner pour chargement */
+.spinner {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    border: 2px solid white;
+    border-top-color: transparent;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    vertical-align: middle;
+    margin-right: 8px;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Toast notification */
+.gps-toast {
+    position: fixed;
+    bottom: 100px;
+    left: 0;
+    right: 0;
+    z-index: 9999;
+    display: flex;
+    justify-content: center;
+    pointer-events: none;
+    animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+    from { transform: translateY(20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+/* Corrections Leaflet pour le thème chaud */
+.leaflet-container {
+    background: var(--bg-main) !important;
+}
+
+.leaflet-tile {
+    filter: sepia(0.2) brightness(1.05) contrast(0.95);
+}
+
+.leaflet-control-attribution {
+    display: none !important;
+}

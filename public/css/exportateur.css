@@ -1,0 +1,80 @@
+.pipeline {
+    display: flex;
+    overflow-x: auto;
+    gap: 1.25rem;
+    padding: 1rem 0;
+    margin-bottom: 2rem;
+    scrollbar-width: none;
+}
+
+.pipeline::-webkit-scrollbar {
+    display: none;
+}
+
+.pipeline-step {
+    min-width: 120px;
+    background: var(--white);
+    padding: 1.25rem 0.75rem;
+    border-radius: 100px;
+    text-align: center;
+    font-size: 10px;
+    font-weight: 800;
+    text-transform: uppercase;
+    color: var(--secondary);
+    border: 1.5px solid rgba(61, 26, 10, 0.1);
+    font-family: var(--font-heading);
+    letter-spacing: 0.05em;
+    box-shadow: var(--shadow);
+}
+
+.pipeline-step.active {
+    background: var(--primary);
+    color: white;
+    border-color: var(--primary);
+}
+
+.arrival-card {
+    background: var(--white);
+    border: none;
+    box-shadow: var(--shadow);
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.arrival-check {
+    width: 24px;
+    height: 24px;
+    accent-color: var(--primary);
+    cursor: pointer;
+}
+
+.selection-summary {
+    position: fixed;
+    bottom: 7.5rem;
+    left: 1.5rem;
+    right: 1.5rem;
+    background: var(--primary);
+    color: white;
+    padding: 1.5rem 1.75rem;
+    border-radius: 100px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 20px 40px rgba(61, 26, 10, 0.4);
+    z-index: 95;
+    font-family: var(--font-heading);
+}
+
+#sel-count {
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    opacity: 0.8;
+}
+
+#sel-weight {
+    font-size: 1.5rem;
+    font-weight: 800;
+    letter-spacing: -0.04em;
+}

@@ -1,0 +1,9 @@
+{
+  "name": "ChainCacao",
+  "description": "Une application PWA complète pour la traçabilité du cacao (Agriculteur, Coopérative, Exportateur, Vérificateur).",
+  "requestFramePermissions": [
+    "camera",
+    "geolocation"
+  ],
+  "majorCapabilities": []
+}

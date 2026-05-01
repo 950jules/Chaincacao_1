@@ -1,0 +1,115 @@
+.verify-result-header h2 {
+    font-family: var(--font-heading);
+    font-size: 1.8rem;
+    font-weight: 800;
+    margin-bottom: 1.5rem;
+    letter-spacing: -0.04em;
+    color: var(--primary);
+}
+
+/* Timeline */
+.timeline {
+    position: relative;
+    padding-left: 2.5rem;
+    margin: 2.5rem 0;
+}
+
+.timeline::before {
+    content: '';
+    position: absolute;
+    left: 11px;
+    top: 5px;
+    bottom: 5px;
+    width: 2px;
+    background: rgba(61, 26, 10, 0.1);
+}
+
+.timeline-event {
+    position: relative;
+    margin-bottom: 2.5rem;
+}
+
+.timeline-dot {
+    position: absolute;
+    left: -2.2rem;
+    top: 6px;
+    width: 14px;
+    height: 14px;
+    background: var(--success);
+    border-radius: 50%;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 0 0 5px rgba(45, 90, 27, 0.1);
+}
+
+.timeline-content {
+    background: var(--white);
+    padding: 1.5rem;
+    border-radius: 20px;
+    box-shadow: var(--shadow);
+    border: none;
+}
+
+.timeline-content h4 {
+    font-family: var(--font-heading);
+    font-size: 0.95rem;
+    font-weight: 800;
+    margin-bottom: 0.4rem;
+    color: var(--primary);
+}
+
+.timeline-content .actor {
+    font-family: var(--font-heading);
+    font-size: 11px;
+    color: var(--secondary);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.timeline-content .tx-hash {
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    color: var(--secondary);
+    word-break: break-all;
+    margin-top: 1rem;
+    background: var(--bg-main);
+    padding: 6px 10px;
+    border-radius: 8px;
+    opacity: 0.8;
+}
+
+.eudr-badge {
+    background: var(--success);
+    color: white;
+    padding: 1.75rem;
+    border-radius: 24px;
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 15px 30px rgba(45, 90, 27, 0.25);
+}
+
+.eudr-badge strong {
+    font-family: var(--font-heading);
+    font-weight: 800;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    letter-spacing: 0.05em;
+}
+
+.eudr-badge div {
+    font-size: 0.95rem;
+    font-weight: 500;
+    opacity: 0.9;
+}
+
+#map-verify {
+    height: 250px;
+    border-radius: 24px;
+    margin: 2rem 0;
+    box-shadow: var(--shadow);
+}
