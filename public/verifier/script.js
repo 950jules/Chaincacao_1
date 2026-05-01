@@ -24,17 +24,23 @@ const verification = {
     },
 
     setupListeners() {
-        document.getElementById('search-btn').onclick = () => {
-            const id = document.getElementById('lot-id-input').value.trim();
+        const btn = document.getElementById('search-btn');
+        const input = document.getElementById('lot-id-input');
+
+        btn.onclick = () => {
+            console.log("Clic sur bouton vérifier");
+            const id = input.value.trim();
             this.performSearch(id);
         };
 
-        document.getElementById('lot-id-input').onkeypress = (e) => {
+        input.onkeypress = (e) => {
             if (e.key === 'Enter') {
-                const id = document.getElementById('lot-id-input').value.trim();
+                const id = input.value.trim();
                 this.performSearch(id);
             }
         };
+        
+        console.log("Listeners de recherche configurés");
     },
 
     async performSearch(lotId) {
@@ -65,7 +71,8 @@ const verification = {
 
         } catch (e) {
             console.error(e);
-            msgEl.innerHTML = "Erreur technique lors de la recherche.";
+            msgEl.innerHTML = "Erreur: " + (e.message.includes('permission') ? "ID non autorisé ou accès refusé." : "ID inexistant ou erreur réseau.");
+            msgEl.style.color = "#D32F2F";
         }
     },
 
