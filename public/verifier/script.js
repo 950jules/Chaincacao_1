@@ -2,6 +2,12 @@ const verification = {
     async init() {
         try {
             await database.init();
+            
+            // Sign in anonymously for rules
+            if (window.firebase) {
+                await firebase.auth().signInAnonymously();
+            }
+
             this.setupListeners();
             if (window.lucide) window.lucide.createIcons();
             

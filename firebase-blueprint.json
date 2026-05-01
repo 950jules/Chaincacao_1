@@ -1,0 +1,73 @@
+{
+  "entities": {
+    "User": {
+      "title": "Utilisateur",
+      "description": "Utilisateurs du système (Agriculteurs, Coopératives, Exportateurs)",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "firstname": { "type": "string" },
+        "lastname": { "type": "string" },
+        "role": { "type": "string", "enum": ["AGR", "COOP", "EXP", "VER"] },
+        "email": { "type": "string", "format": "email" }
+      },
+      "required": ["id", "firstname", "lastname", "role"]
+    },
+    "Lot": {
+      "title": "Lot de Cacao",
+      "description": "Lot de cacao créé par un agriculteur",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "weight": { "type": "number" },
+        "bags": { "type": "number" },
+        "species": { "type": "string" },
+        "region": { "type": "string" },
+        "gps": {
+          "type": "object",
+          "properties": {
+            "lat": { "type": "number" },
+            "lng": { "type": "number" }
+          }
+        },
+        "farmerId": { "type": "string" },
+        "status": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "weight", "region", "gps", "farmerId", "status", "createdAt"]
+    },
+    "Transfer": {
+      "title": "Transfert / Etape Blockchain",
+      "description": "Evénement de transfert ou de validation dans la chaîne",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "lotId": { "type": "string" },
+        "actorId": { "type": "string" },
+        "fromActor": { "type": "string" },
+        "toActor": { "type": "string" },
+        "fromRole": { "type": "string" },
+        "toRole": { "type": "string" },
+        "status": { "type": "string" },
+        "timestamp": { "type": "string", "format": "date-time" },
+        "txHash": { "type": "string" },
+        "officialWeight": { "type": "number" }
+      },
+      "required": ["id", "lotId", "actorId", "status", "timestamp", "txHash"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "User",
+      "description": "Profils utilisateurs"
+    },
+    "/lots/{lotId}": {
+      "schema": "Lot",
+      "description": "Données des lots de cacao"
+    },
+    "/transfers/{transferId}": {
+      "schema": "Transfer",
+      "description": "Historique des transferts blockchain"
+    }
+  }
+}

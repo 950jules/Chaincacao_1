@@ -2,6 +2,14 @@ const auth = {
     currentUser: null,
 
     async init() {
+        // Sign in anonymously to satisfy security rules
+        try {
+            await firebase.auth().signInAnonymously();
+            console.log("Firebase Auth: Signed in anonymously");
+        } catch (e) {
+            console.error("Firebase Auth Error:", e);
+        }
+
         this.currentUser = JSON.parse(localStorage.getItem('chaincacao_user'));
         if (this.currentUser) {
             app.initUserSession(this.currentUser);

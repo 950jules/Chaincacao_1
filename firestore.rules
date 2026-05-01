@@ -1,0 +1,58 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Helper functions
+    function isSignedIn() { return request.auth != null; }
+    function isValidId(id) { return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$'); }
+    function incoming() { return request.resource.data; }
+    function existing() { return resource.data; }
+    
+    // Default deny
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // User profiles
+    match /users/{userId} {
+      allow read: if isSignedIn();
+      allow write: if isSignedIn() && request.auth.uid == userId;
+    }
+
+    // Lots
+    match /lots/{lotId} {
+      // Publicly readable for verification
+      allow get: if isValidId(lotId);
+      allow list: if true; // In a production app, we'd limit this, but here we need to find lot by ID
+      
+      allow create: if isSignedIn() && isValidLot(incoming());
+      allow update: if isSignedIn() && (
+        (incoming().status != existing().status && incoming().diff(existing()).affectedKeys().hasOnly(['status']))
+      );
+    }
+
+    // Transfers
+    match /transfers/{transferId} {
+      // Publicly readable for verification when searching by lotId
+      allow get: if isValidId(transferId);
+      allow list: if true;
+
+      allow create: if isSignedIn() && isValidTransfer(incoming()) && exists(/databases/$(database)/documents/lots/$(incoming().lotId));
+    }
+
+    // Validation functions
+    function isValidLot(data) {
+      return data.keys().hasAll(['id', 'weight', 'region', 'gps', 'farmerId', 'status', 'createdAt'])
+        && data.id is string
+        && data.weight is number
+        && data.status in ['initial', 'validated', 'exported', 'arrived']
+        && data.createdAt is string;
+    }
+
+    function isValidTransfer(data) {
+      return data.keys().hasAll(['id', 'lotId', 'actorId', 'status', 'timestamp', 'txHash'])
+        && data.id is string
+        && data.lotId is string
+        && data.txHash is string;
+    }
+  }
+}
