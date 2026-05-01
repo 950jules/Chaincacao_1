@@ -24,34 +24,58 @@ const app = {
             </div>`;
         }
         
-        // Isolation des fonctionnalités par rôle
         const navItems = document.querySelectorAll('.nav-item');
+        let allowedScreen = '';
+
+        if (user.role === 'AGR') allowedScreen = 'agriculteur';
+        else if (user.role === 'COOP') allowedScreen = 'cooperative';
+        else if (user.role === 'EXP') allowedScreen = 'exportateur';
+        else if (user.role === 'VER') allowedScreen = 'verificateur';
+
         navItems.forEach(item => {
             const screenId = item.getAttribute('data-screen');
-            let isAllowed = false;
-
-            if (user.role === 'AGR' && screenId === 'agriculteur') isAllowed = true;
-            else if (user.role === 'COOP' && screenId === 'cooperative') isAllowed = true;
-            else if (user.role === 'EXP' && screenId === 'exportateur') isAllowed = true;
-            else if (user.role === 'VER' && screenId === 'verificateur') isAllowed = true;
-
-            // Masquer les onglets non autorisés
-            if (isAllowed) {
+            if (screenId === allowedScreen) {
                 item.style.display = 'flex';
+                item.classList.add('active');
             } else {
-                item.style.display = 'none';
+                item.style.display = 'none'; // Use display none strictly
+                item.classList.remove('active');
             }
         });
         
-        if (user.role === 'AGR') this.switchScreen('agriculteur');
-        else if (user.role === 'COOP') this.switchScreen('cooperative');
-        else if (user.role === 'EXP') this.switchScreen('exportateur');
-        else if (user.role === 'VER') this.switchScreen('verificateur');
+        if (allowedScreen) {
+            this.switchScreen(allowedScreen);
+        }
     },
 
     switchScreen(id) {
-        const navItem = document.querySelector(`.nav-item[data-screen="${id}"]`);
-        if (navItem) navItem.click();
+        const screens = document.querySelectorAll('.screen');
+        const navItems = document.querySelectorAll('.nav-item');
+        const targetItem = document.querySelector(`.nav-item[data-screen="${id}"]`);
+
+        // Check if allowed
+        const user = JSON.parse(localStorage.getItem('chaincacao_user'));
+        if (user) {
+            let isAllowed = false;
+            if (user.role === 'AGR' && id === 'agriculteur') isAllowed = true;
+            else if (user.role === 'COOP' && id === 'cooperative') isAllowed = true;
+            else if (user.role === 'EXP' && id === 'exportateur') isAllowed = true;
+            else if (user.role === 'VER' && id === 'verificateur') isAllowed = true;
+            
+            if (!isAllowed) return;
+        }
+
+        // Update Nav
+        navItems.forEach(i => i.classList.remove('active'));
+        if (targetItem) targetItem.classList.add('active');
+
+        // Update Screen
+        screens.forEach(s => s.classList.add('hidden'));
+        const screen = document.getElementById(`screen-${id}`);
+        if (screen) screen.classList.remove('hidden');
+
+        // Render content
+        this.renderScreen(id);
     },
 
     refreshIcons() {

@@ -16,9 +16,9 @@
     justify-content: space-between;
     align-items: center;
     background: rgba(45, 90, 27, 0.05);
-    padding: 1.25rem;
+    padding: 1rem;
     border-radius: 16px;
-    margin: 2rem 0;
+    margin: 1.5rem 0;
     border: 1px solid rgba(45, 90, 27, 0.1);
 }
 
@@ -28,6 +28,10 @@
     color: var(--success);
     font-size: 1.1rem;
 }
+
+.weight-diff.gap-ok { color: var(--success); }
+.weight-diff.gap-warning { color: #F57F17; }
+.weight-diff.gap-danger { color: var(--danger); }
 
 .grade-toggles {
     display: grid;

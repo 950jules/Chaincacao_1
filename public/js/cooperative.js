@@ -152,19 +152,43 @@ const cooperative = {
             
             box.classList.remove('hidden');
             gap.innerText = utils.formatPercentage(diff);
-            gap.className = 'weight-diff ' + (diff < 0.02 ? 'gap-ok' : diff < 0.05 ? 'gap-warning' : 'gap-danger');
+            
+            // UI Visual feedback on colors and background
+            if (diff > 0.03) {
+                gap.style.color = 'var(--danger)';
+                box.style.background = 'rgba(211, 47, 47, 0.1)';
+                box.style.borderColor = 'rgba(211, 47, 47, 0.3)';
+            } else if (diff > 0.01) {
+                gap.style.color = '#F57F17';
+                box.style.background = 'rgba(245, 127, 23, 0.1)';
+                box.style.borderColor = 'rgba(245, 127, 23, 0.3)';
+            } else {
+                gap.style.color = 'var(--success)';
+                box.style.background = 'rgba(56, 142, 60, 0.1)';
+                box.style.borderColor = 'rgba(56, 142, 60, 0.3)';
+            }
         };
     },
 
     async validateLot(lotId) {
         const user = JSON.parse(localStorage.getItem('chaincacao_user')) || { id: 'COOP-001' };
-        const offWeight = parseFloat(document.getElementById('official-weight').value);
+        const offWeightInput = document.getElementById('official-weight');
+        const offWeight = parseFloat(offWeightInput.value);
         const moisture = parseFloat(document.getElementById('moisture-test').value);
         const payment = document.getElementById('payment-status').value;
         
-        if (isNaN(offWeight)) return alert("Poids invalide");
+        if (isNaN(offWeight)) return alert("Veuillez saisir le poids officiel.");
         
         const lot = await database.getLot(lotId);
+        const diff = Math.abs(offWeight - lot.weight) / lot.weight;
+
+        if (diff > 0.03) {
+            alert(`SANTÉ: L'écart de poids (${utils.formatPercentage(diff)}) est trop important (max 3%). Validation refusée.`);
+            offWeightInput.style.borderColor = 'var(--danger)';
+            offWeightInput.focus();
+            return;
+        }
+
         lot.weight = offWeight;
         lot.status = 'COOP_VALIDATED';
         lot.quality = { moisture, grade: this.selectedGrade };
@@ -198,8 +222,9 @@ const cooperative = {
     },
 
     async renderHistory() {
+        const user = JSON.parse(localStorage.getItem('chaincacao_user')) || { id: 'COOP-001' };
         const transfers = await idb.openDB(DB_NAME, DB_VERSION).then(db => db.getAll('transfers'));
-        const coopTransfers = transfers.filter(t => t.actorId === 'COOP-001').reverse();
+        const coopTransfers = transfers.filter(t => t.actorId === user.id).reverse();
         
         const container = document.getElementById('cooperative-history');
         container.innerHTML = `

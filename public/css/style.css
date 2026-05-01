@@ -1,18 +1,20 @@
 :root {
-    --bg-main: #F5EFE6;
+    --bg-main: #FCF9F5;
     --bg-card: #FFFFFF;
-    --primary: #3D1A0A;
-    --success: #2D5A1B;
-    --accent: #C8401A;
-    --secondary: #8B7355;
-    --text-main: #3D1A0A;
+    --primary: #5D2E17; /* Vibrant Coffee */
+    --success: #388E3C; /* Vibrant Green */
+    --warning: #FBC02D;
+    --danger: #D32F2F;
+    --accent: #E67E22;
+    --secondary: #8D5B3E;
+    --text-main: #2C1810;
     --white: #FFFFFF;
-    --gray: #E8E2D9;
-    --shadow: 0 10px 15px -3px rgba(61, 26, 10, 0.1), 0 4px 6px -2px rgba(61, 26, 10, 0.05);
-    --border-radius: 24px;
-    --font-heading: 'Sora', sans-serif;
-    --font-body: 'DM Sans', sans-serif;
-    --font-mono: 'ui-monospace', 'SFMono-Regular', Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    --gray: #E0D3C1;
+    --shadow: 0 10px 30px rgba(93, 46, 23, 0.08);
+    --border-radius: 20px;
+    --font-heading: 'Outfit', sans-serif;
+    --font-body: 'Plus Jakarta Sans', sans-serif;
+    --font-mono: 'JetBrains Mono', monospace;
 }
 
 * {
@@ -32,9 +34,10 @@ body {
     font-family: var(--font-body);
     background-color: var(--bg-main);
     color: var(--text-main);
-    line-height: 1.6;
+    line-height: 1.4;
     overflow-x: hidden;
     height: 100vh;
+    font-size: 0.9rem;
 }
 
 #app {
@@ -49,7 +52,7 @@ body {
 .app-header {
     background: var(--bg-main);
     color: var(--primary);
-    padding: 2rem 1.5rem 1.5rem;
+    padding: 1rem 1.5rem 1rem;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -58,22 +61,22 @@ body {
 }
 
 .logo-icon-box {
-    width: 44px;
-    height: 44px;
+    width: 36px;
+    height: 36px;
     background-color: var(--primary);
-    border-radius: 12px;
+    border-radius: 10px;
     display: flex;
     align-items: center;
     justify-content: center;
     color: white;
     font-weight: 800;
-    font-size: 1.5rem;
+    font-size: 1.2rem;
     font-family: var(--font-heading);
 }
 
 .logo-text h1 {
     font-family: var(--font-heading);
-    font-size: 1.4rem;
+    font-size: 1.2rem;
     font-weight: 800;
     text-transform: none;
     letter-spacing: -0.02em;
@@ -119,8 +122,8 @@ body {
 main {
     flex: 1;
     overflow-y: auto;
-    padding: 1.25rem;
-    padding-bottom: 7rem;
+    padding: 1rem;
+    padding-bottom: 6.5rem;
 }
 
 .screen {
@@ -321,9 +324,9 @@ main {
 .proc-step i.done { color: var(--success); }
 
 .section-title {
-    margin: 2rem 0 1rem;
+    margin: 1.5rem 0 0.75rem;
     font-family: var(--font-heading);
-    font-size: 1rem;
+    font-size: 0.9rem;
     font-weight: 800;
     text-transform: uppercase;
     letter-spacing: 0.5px;
@@ -429,8 +432,8 @@ main {
 }
 
 .nav-item .icon {
-    font-size: 1.4rem;
-    margin-bottom: 4px;
+    font-size: 1.25rem;
+    margin-bottom: 2px;
 }
 
 .nav-item .label {
@@ -454,8 +457,8 @@ main {
 .card {
     background: var(--white);
     border-radius: var(--border-radius);
-    padding: 1.5rem;
-    margin-bottom: 1.25rem;
+    padding: 1rem;
+    margin-bottom: 0.75rem;
     box-shadow: var(--shadow);
     border: 1px solid rgba(61, 26, 10, 0.05);
     transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
@@ -487,18 +490,18 @@ main {
 
 .search-box input {
     flex: 1;
-    padding: 1.1rem;
+    padding: 0.75rem 1rem;
     border-radius: 100px;
     border: 1.5px solid rgba(61, 26, 10, 0.1);
     background: var(--white);
     color: var(--primary);
     font-weight: 600;
     font-family: var(--font-body);
-    font-size: 0.9rem;
+    font-size: 0.8rem;
 }
 
 .search-box button {
-    padding: 0 1.5rem;
+    padding: 0 1.2rem;
     background: var(--primary);
     color: white;
     border-radius: 100px;
@@ -506,10 +509,10 @@ main {
     font-family: var(--font-heading);
     font-weight: 700;
     text-transform: uppercase;
-    font-size: 0.75rem;
+    font-size: 0.65rem;
     letter-spacing: 0.05em;
-    min-width: 100px;
-    height: 52px;
+    min-width: 80px;
+    height: 44px;
     cursor: pointer;
     box-shadow: 0 8px 20px rgba(61, 26, 10, 0.15);
     transition: all 0.2s;
@@ -517,7 +520,7 @@ main {
 
 .btn {
     font-family: var(--font-heading);
-    padding: 1.1rem 1.5rem;
+    padding: 0.75rem 1rem;
     border: none;
     border-radius: 100px;
     font-weight: 700;
@@ -526,9 +529,9 @@ main {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 0.6rem;
+    gap: 0.5rem;
     width: 100%;
-    font-size: 0.95rem;
+    font-size: 0.8rem;
     letter-spacing: -0.01em;
 }
 
@@ -584,13 +587,13 @@ main {
 
 .modal-content {
     background: var(--white);
-    border-radius: 32px;
+    border-radius: 28px;
     width: 100%;
     max-width: 440px;
     max-height: 85vh;
     overflow-y: auto;
     position: relative;
-    padding: 2.5rem;
+    padding: 1.5rem;
     box-shadow: 0 30px 60px -12px rgba(61, 26, 10, 0.25);
     border: none;
 }

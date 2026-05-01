@@ -204,7 +204,7 @@ const agriculteur = {
         const lot = {
             id: id,
             farmerId: user.id,
-            farmerName: `${user.firstname} ${user.lastname}`,
+            farmerName: `${user.firstname} ${user.lastname || ''}`.trim(),
             timestamp: now,
             weight: this.formState.data.weight,
             species: this.formState.data.species,
