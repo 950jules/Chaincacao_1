@@ -681,3 +681,135 @@ main {
 .gap-ok { color: var(--success); }
 .gap-warning { color: var(--warning); }
 .gap-danger { color: var(--danger); }
+
+/* --- DEMO MODE STYLES --- */
+#demo-float-btn {
+    position: fixed;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #FFD700;
+    color: #000;
+    padding: 1rem 2.5rem;
+    border-radius: 50px;
+    font-weight: 900;
+    font-size: 1.1rem;
+    box-shadow: 0 10px 40px rgba(255, 215, 0, 0.6);
+    z-index: 10000;
+    cursor: pointer;
+    border: 4px solid white;
+    font-family: var(--font-heading);
+    animation: demoPulse 2s infinite;
+}
+
+@keyframes demoPulse {
+    0% { transform: translateX(-50%) scale(1); }
+    50% { transform: translateX(-50%) scale(1.05); }
+    100% { transform: translateX(-50%) scale(1); }
+}
+
+#demo-control-bar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    background: #2C1810;
+    color: white;
+    padding: 15px;
+    z-index: 10001;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+}
+
+.demo-progress {
+    height: 6px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 3px;
+    margin-bottom: 10px;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    background: #FFD700;
+    transition: width 0.5s ease;
+}
+
+.demo-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.8rem;
+    font-weight: 700;
+}
+
+.demo-controls button {
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.2);
+    color: white;
+    padding: 5px 12px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+#demo-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.6);
+    backdrop-filter: blur(4px);
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none; /* Allows interactions below for the steps but visually blocks */
+}
+
+.demo-msg {
+    background: white;
+    color: var(--primary);
+    padding: 20px 40px;
+    border-radius: 20px;
+    font-weight: 800;
+    font-size: 1.2rem;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+    text-align: center;
+    max-width: 80%;
+    border-bottom: 5px solid #FFD700;
+}
+
+.demo-summary {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    padding: 3rem;
+    border-radius: 30px;
+    z-index: 10002;
+    text-align: center;
+    box-shadow: 0 30px 100px rgba(0,0,0,0.8);
+    width: 90%;
+    max-width: 400px;
+}
+
+.demo-summary h2 { color: var(--success); font-size: 2rem; margin-bottom: 1rem; }
+.demo-summary button {
+    margin-top: 2rem;
+    width: 100%;
+    padding: 1rem;
+    background: var(--primary);
+    color: white;
+    border-radius: 15px;
+    border: none;
+    font-weight: 800;
+    cursor: pointer;
+}
+
+.demo-highlight {
+    outline: 4px solid #FFD700 !important;
+    outline-offset: 4px;
+    box-shadow: 0 0 40px #FFD700 !important;
+    transition: all 0.3s;
+}

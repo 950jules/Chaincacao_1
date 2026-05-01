@@ -61,6 +61,12 @@ const demo = {
 
     async start() {
         if (this.currentStep > 0) return;
+        
+        // Initial clearing for a clean demo run
+        if (window.database && database.clearAllData) {
+            await database.clearAllData();
+        }
+        
         this.currentStep = 1;
         document.getElementById('demo-float-btn').classList.add('hidden');
         document.getElementById('demo-control-bar').classList.remove('hidden');
@@ -90,6 +96,16 @@ const demo = {
         return new Promise(resolve => setTimeout(resolve, ms / this.speed));
     },
 
+    setPersona(role) {
+        const personas = {
+            farmer: { id: 'AGRI-DEMO-01', firstname: 'Kodjo', lastname: 'Démovore', role: 'AGR' },
+            coop: { id: 'COOP-DEMO-01', firstname: 'Coopérative', lastname: 'Plateau', role: 'COOP' },
+            export: { id: 'EXP-DEMO-01', firstname: 'Exporter', lastname: 'Togo', role: 'EXP' },
+            verify: { id: 'VERIFY-DEMO-01', firstname: 'Audit', lastname: 'EUDR', role: 'VER' }
+        };
+        localStorage.setItem('chaincacao_user', JSON.stringify(personas[role]));
+    },
+
     highlight(selector) {
         const el = document.querySelector(selector);
         if (el) {
@@ -108,10 +124,22 @@ const demo = {
 
         try {
             switch(this.currentStep) {
-                case 1: await this.stepFarmer(); break;
-                case 2: await this.stepCoop(); break;
-                case 3: await this.stepExport(); break;
-                case 4: await this.stepVerify(); break;
+                case 1: 
+                    this.setPersona('farmer');
+                    await this.stepFarmer(); 
+                    break;
+                case 2: 
+                    this.setPersona('coop');
+                    await this.stepCoop(); 
+                    break;
+                case 3: 
+                    this.setPersona('export');
+                    await this.stepExport(); 
+                    break;
+                case 4: 
+                    this.setPersona('verify');
+                    await this.stepVerify(); 
+                    break;
                 default: 
                     this.finish();
                     return;
@@ -120,14 +148,14 @@ const demo = {
             this.executeStep();
         } catch (e) {
             console.error("Erreur démo:", e);
-            alert("La démo a rencontré une erreur technique.");
+            alert("La démo a rencontré une erreur technique : " + e.message);
         }
     },
 
     // --- ÉTAPES ---
 
     async stepFarmer() {
-        document.querySelector('.demo-msg').innerText = "Étape 1: Création du lot par l'agriculteur";
+        document.querySelector('.demo-msg').innerText = "Étape 1: Création du lot par l'agriculteur (Kodjo)";
         app.switchScreen('agriculteur');
         await this.wait(1000);
         
@@ -138,44 +166,45 @@ const demo = {
 
         // Étape 1: Saisie
         document.getElementById('f-weight').value = 75;
-        document.getElementById('f-bags').value = 3;
+        document.getElementById('f-species').value = "Forastero";
         document.getElementById('f-region').value = "Kpalimé";
         this.highlight('#f-weight');
         await this.wait(800);
-        agriculteur.nextStep(2);
+        await agriculteur.nextStep(2);
         await this.wait(1000);
 
         // Étape 2: GPS
         agriculteur.formState.data.gps = { lat: 6.9075, lng: 0.6339 };
-        document.getElementById('f-gps-display').innerHTML = "GPS: 6.9075, 0.6339 (Fixé)";
+        document.getElementById('f-gps-display').innerHTML = "GPS: 6.9075, 0.6339 (Fixé pour démo)";
         this.highlight('#btn-gps-capture');
         await this.wait(1000);
 
-        agriculteur.nextStep(3);
-        await this.wait(1500);
+        await agriculteur.nextStep(3);
+        await this.wait(2000);
     },
 
     async stepCoop() {
-        document.querySelector('.demo-msg').innerText = "Étape 2: Validation coopérative & scellage blockchain";
+        document.querySelector('.demo-msg').innerText = "Étape 2: Validation coopérative & Scellage Blockchain";
         app.switchScreen('cooperative');
         await this.wait(1000);
 
         const lots = await database.getAllLots();
+        if (lots.length === 0) throw new Error("Lot non trouvé dans la base");
         const demoLot = lots[lots.length - 1];
 
         // Ouvrir validation
-        cooperative.loadLotDetails(demoLot.id);
+        await cooperative.loadLotDetails(demoLot.id);
         await this.wait(1000);
 
         // Saisir poids réel
-        document.getElementById('official-weight').value = 74.2;
+        document.getElementById('official-weight').value = 74.5;
         this.highlight('#official-weight');
         await this.wait(1000);
 
         // Sceller
         this.highlight('.btn-primary');
         await cooperative.validateLot(demoLot.id);
-        await this.wait(1500);
+        await this.wait(2000);
     },
 
     async stepExport() {
@@ -198,19 +227,22 @@ const demo = {
         // Override confirm/prompt
         const oldConfirm = window.confirm;
         const oldPrompt = window.prompt;
+        const oldAlert = window.alert;
         window.confirm = () => true;
-        window.prompt = () => "MEDU-TG-001";
+        window.prompt = () => "MEDU-TG-2026-001";
+        window.alert = () => true;
         
         await exportateur.createManifest();
         
         window.confirm = oldConfirm;
         window.prompt = oldPrompt;
+        window.alert = oldAlert;
         
-        await this.wait(5000); // Temps pour voir la procédure Douanes
+        await this.wait(2000); 
     },
 
     async stepVerify() {
-        document.querySelector('.demo-msg').innerText = "Étape 4: Vérification finale de la traçabilité";
+        document.querySelector('.demo-msg').innerText = "Étape 4: Vérification finale (Consommateur/Régulateur)";
         app.switchScreen('verificateur');
         await this.wait(1000);
 
@@ -223,11 +255,11 @@ const demo = {
 
         this.highlight('#btn-verify');
         await verificateur.verifyLot(demoLot.id);
-        await this.wait(1500);
+        await this.wait(2000);
 
         // Download simulation
         this.highlight('#btn-download-pdf');
-        await this.wait(1000);
+        await this.wait(1500);
     },
 
     finish() {

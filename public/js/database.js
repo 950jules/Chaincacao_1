@@ -41,6 +41,13 @@ const database = {
         return db.getAll('users');
     },
 
+    async clearAllData() {
+        const tx = db.transaction(['lots', 'transfers'], 'readwrite');
+        await tx.objectStore('lots').clear();
+        await tx.objectStore('transfers').clear();
+        await tx.done;
+    },
+
     async addLot(lot) {
         return db.add('lots', lot);
     },
