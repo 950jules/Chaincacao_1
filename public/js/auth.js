@@ -11,6 +11,8 @@ const auth = {
     },
 
     showAuthScreen() {
+        if (document.getElementById('auth-screen')) return;
+        
         const appEl = document.getElementById('app');
         const authContainer = document.createElement('div');
         authContainer.id = 'auth-screen';
@@ -23,8 +25,8 @@ const auth = {
                 </div>
                 
                 <div class="auth-tabs">
-                    <button id="tab-login" class="active" onclick="auth.switchTab('login')">Connexion</button>
-                    <button id="tab-register" onclick="auth.switchTab('register')">Inscription</button>
+                    <button id="tab-login" class="active">Connexion</button>
+                    <button id="tab-register">Inscription</button>
                 </div>
 
                 <div id="login-form" class="auth-form">
@@ -36,13 +38,13 @@ const auth = {
                         <label>Mot de passe</label>
                         <input type="password" id="login-pass" placeholder="••••••••">
                     </div>
-                    <button class="btn btn-primary" onclick="auth.login()">SE CONNECTER</button>
+                    <button class="btn btn-primary" id="btn-login-submit">SE CONNECTER</button>
                 </div>
 
                 <div id="register-form" class="auth-form hidden">
                     <div class="input-group">
                         <label>Je suis un :</label>
-                        <select id="reg-role" onchange="auth.updatePrefix()">
+                        <select id="reg-role">
                             <option value="AGR">Agriculteur</option>
                             <option value="COOP">Coopérative</option>
                             <option value="EXP">Exportateur</option>
@@ -89,12 +91,19 @@ const auth = {
                         <label>Confirmer le mot de passe</label>
                         <input type="password" id="reg-pass-confirm" placeholder="••••••••">
                     </div>
-                    <button class="btn btn-primary" onclick="auth.register()" style="margin-top:10px">S'INSCRIRE</button>
+                    <button class="btn btn-primary" id="btn-register-submit" style="margin-top:10px">S'INSCRIRE</button>
                 </div>
             </div>
         `;
         document.body.appendChild(authContainer);
         appEl.classList.add('blurred');
+
+        // Attach Event Listeners
+        document.getElementById('tab-login').onclick = () => this.switchTab('login');
+        document.getElementById('tab-register').onclick = () => this.switchTab('register');
+        document.getElementById('btn-login-submit').onclick = () => this.login();
+        document.getElementById('btn-register-submit').onclick = () => this.register();
+        document.getElementById('reg-role').onchange = () => this.updatePrefix();
     },
 
     switchTab(tab) {
@@ -105,6 +114,7 @@ const auth = {
     },
 
     async login() {
+        console.log("Login attempt...");
         const id = document.getElementById('login-id').value;
         const pass = document.getElementById('login-pass').value;
 
@@ -119,6 +129,7 @@ const auth = {
     },
 
     async register() {
+        console.log("Register attempt...");
         const role = document.getElementById('reg-role').value;
         const last = document.getElementById('reg-lastname').value;
         const first = document.getElementById('reg-firstname').value;
@@ -160,5 +171,13 @@ const auth = {
     logout() {
         localStorage.removeItem('chaincacao_user');
         location.reload();
+    },
+
+    updatePrefix() {
+        const role = document.getElementById('reg-role').value;
+        const idDisplay = document.querySelector('label[for="reg-phone"]') || { innerText: "" };
+        console.log("Role changed to:", role);
     }
 };
+
+window.auth = auth;
