@@ -30,7 +30,7 @@ service cloud.firestore {
     function isValidLot(data) {
       return data.keys().hasAll(['id', 'farmerId', 'timestamp', 'weight', 'status']) &&
              data.id is string && data.farmerId is string &&
-             data.weight is number && data.weight > 0 &&
+             data.weight is number &&
              data.status in ['CREATED', 'COLLECTED', 'EXPORTED'];
     }
 
@@ -63,13 +63,13 @@ service cloud.firestore {
         (getUserRole(getUserId(request.auth)) == 'COOP' && 
          existing().status == 'CREATED' &&
          incoming().status == 'COLLECTED' &&
-         incoming().diff(existing()).affectedKeys().hasOnly(['status', 'officialWeight', 'qualityGrade', 'coopId'])) ||
+         incoming().diff(existing()).affectedKeys().hasOnly(['status', 'weight', 'officialWeight', 'qualityGrade', 'coopId', 'quality', 'paymentStatus'])) ||
         
         // Action: Export (Exportateur)
         (getUserRole(getUserId(request.auth)) == 'EXP' && 
          existing().status == 'COLLECTED' &&
          incoming().status == 'EXPORTED' &&
-         incoming().diff(existing()).affectedKeys().hasOnly(['status', 'exportManifestId']))
+         incoming().diff(existing()).affectedKeys().hasOnly(['status', 'containerId', 'exportManifestId']))
       ) && isValidLot(incoming());
       
       allow delete: if false;

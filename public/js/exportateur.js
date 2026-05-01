@@ -1,7 +1,7 @@
 const exportateur = {
     async renderDashboard() {
         const lots = await database.getAllLots();
-        const validatedLots = lots.filter(l => l.status === 'COOP_VALIDATED');
+        const validatedLots = lots.filter(l => l.status === 'COLLECTED');
         const totalWeight = validatedLots.reduce((acc, l) => acc + l.weight, 0);
 
         const container = document.getElementById('exportateur-dashboard');
@@ -25,10 +25,12 @@ const exportateur = {
             </div>
 
             <div class="search-box" style="margin-bottom: 2rem">
-                <input type="text" id="export-search" placeholder="Rechercher lot..." oninput="exportateur.filterLots(this.value)">
+                <input type="text" id="export-search" placeholder="Vérifier ID lot (ex: AGOU-CC-XXXX)" style="flex:1">
+                <button onclick="exportateur.verifyLotSearch()" class="btn-search-icon">
+                    <i data-lucide="search" style="width:18px; height:18px"></i>
+                </button>
                 <button onclick="exportateur.startScan()">
-                    <i data-lucide="camera" style="width:16px; height:16px"></i>
-                    SCAN
+                    <i data-lucide="camera" style="width:18px; height:18px"></i>
                 </button>
             </div>
 
@@ -78,6 +80,75 @@ const exportateur = {
             document.getElementById('sel-weight').innerText = `${total.toFixed(1)} KG`;
         } else {
             summary.classList.add('hidden');
+        }
+    },
+
+    async verifyLotSearch() {
+        const id = document.getElementById('export-search').value.trim().toUpperCase();
+        if (!id) return;
+        
+        const lot = await database.getLot(id);
+        if (lot) {
+            this.showLotVerification(lot);
+        } else {
+            alert("Lot introuvable dans le système.");
+        }
+    },
+
+    async showLotVerification(lot) {
+        let statusText = "INCONNU";
+        let statusClass = "";
+        
+        switch(lot.status) {
+            case 'CREATED': statusText = "Producteur (En attente coop)"; break;
+            case 'COLLECTED': statusText = "Collecté (Prêt pour export)"; statusClass = "badge-success"; break;
+            case 'EXPORTED': statusText = "Déjà exporté"; statusClass = "badge-info"; break;
+        }
+
+        app.showModal(`
+            <div style="padding:1rem">
+                <h3 style="color:var(--primary); margin-bottom:1.5rem">Vérification de Lot</h3>
+                <div class="card" style="background:var(--card-bg)">
+                    <div style="margin-bottom:1rem">
+                        <label style="font-size:0.7rem; text-transform:uppercase; color:var(--secondary)">ID LOT</label>
+                        <div style="font-weight:800; font-size:1.2rem">${lot.id}</div>
+                    </div>
+                    <div style="margin-bottom:1rem">
+                        <label style="font-size:0.7rem; text-transform:uppercase; color:var(--secondary)">Status Actuel</label>
+                        <div><span class="badge ${statusClass}">${statusText}</span></div>
+                    </div>
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:1rem">
+                        <div>
+                            <label style="font-size:0.7rem; text-transform:uppercase; color:var(--secondary)">Poids</label>
+                            <div style="font-weight:700">${lot.weight} kg</div>
+                        </div>
+                        <div>
+                            <label style="font-size:0.7rem; text-transform:uppercase; color:var(--secondary)">Humidité</label>
+                            <div style="font-weight:700">${lot.quality?.moisture || 'N/A'}%</div>
+                        </div>
+                    </div>
+                    <div>
+                        <label style="font-size:0.7rem; text-transform:uppercase; color:var(--secondary)">Origine GPS</label>
+                        <div style="font-size:0.9rem">${lot.gps.lat.toFixed(4)}, ${lot.gps.lng.toFixed(4)}</div>
+                    </div>
+                </div>
+                ${lot.status === 'COLLECTED' ? `
+                    <button class="btn btn-primary" style="width:100%; margin-top:1.5rem" onclick="exportateur.selectLotForExport('${lot.id}')">SÉLECTIONNER POUR EXPORT</button>
+                ` : ''}
+            </div>
+        `);
+        app.refreshIcons();
+    },
+
+    selectLotForExport(lotId) {
+        document.querySelector('.close-modal').click();
+        // Coche la case correspondante si elle est visible
+        const check = document.querySelector(`.arrival-check[data-id="${lotId}"]`);
+        if (check) {
+            check.checked = true;
+            this.updateSummary();
+        } else {
+            alert("Lot sélectionné, mais non visible dans la liste d'attente (vérifiez le status).");
         }
     },
 

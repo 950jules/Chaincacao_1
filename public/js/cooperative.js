@@ -190,9 +190,12 @@ const cooperative = {
         }
 
         lot.weight = offWeight;
-        lot.status = 'COOP_VALIDATED';
+        lot.officialWeight = offWeight;
+        lot.status = 'COLLECTED';
         lot.quality = { moisture, grade: this.selectedGrade };
+        lot.qualityGrade = this.selectedGrade;
         lot.paymentStatus = payment;
+        lot.coopId = user.id;
         await database.updateLot(lot);
 
         const tx = await blockchain.simulateTransaction({ offWeight, lotId, moisture, grade: this.selectedGrade }, user.id);
@@ -224,7 +227,7 @@ const cooperative = {
     async renderHistory() {
         const user = auth.currentUser || { id: 'COOP-001' };
         const allLots = await database.getAllLots();
-        const validatedLots = allLots.filter(l => (l.status === 'COOP_VALIDATED' || l.status === 'EXPORTED') && l.coopId === user.id).reverse();
+        const validatedLots = allLots.filter(l => (l.status === 'COLLECTED' || l.status === 'EXPORTED') && l.coopId === user.id).reverse();
         
         const container = document.getElementById('cooperative-history');
         container.innerHTML = `
