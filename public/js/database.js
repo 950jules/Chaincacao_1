@@ -15,14 +15,28 @@ const database = {
     async init() {
         if (!window.firebase) {
             console.error("Firebase SDK non chargé");
-            return;
+            throw new Error("SDK Firebase manquant");
         }
 
-        const app = firebase.initializeApp(firebaseConfig);
-        // Utilisation de l'ID de base de données spécifique si fourni
-        db = firebase.app().firestore(firebaseConfig.firestoreDatabaseId);
+        try {
+            // Check if app is already initialized
+            let app;
+            if (firebase.apps.length === 0) {
+                app = firebase.initializeApp(firebaseConfig);
+                console.log("Firebase App initialisée");
+            } else {
+                app = firebase.app();
+            }
 
-        console.log("Firebase Database initialisée:", firebaseConfig.firestoreDatabaseId);
+            // In compat SDK, firebase.app().firestore() is usually used
+            // Multi-database support in compat is limited, so we use the default or what's configured
+            db = firebase.firestore();
+
+            console.log("Firestore ready");
+        } catch (e) {
+            console.error("Firestore init failed:", e);
+            throw e;
+        }
     },
 
     // Error handler mandatory for security rule debugging

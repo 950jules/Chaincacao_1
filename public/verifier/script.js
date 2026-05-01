@@ -1,16 +1,18 @@
 const verification = {
     async init() {
+        console.log("Verification init starting...");
         try {
             await database.init();
             
             // Sign in anonymously for rules
             if (window.firebase) {
-                await firebase.auth().signInAnonymously();
+                await firebase.auth().signInAnonymously().catch(e => console.error("Anonym auth failed", e));
             }
 
             this.setupListeners();
             if (window.lucide) window.lucide.createIcons();
             
+            console.log("Verification init complete");
             // Check for ID in URL
             const urlParams = new URLSearchParams(window.location.search);
             const id = urlParams.get('id');
@@ -20,6 +22,8 @@ const verification = {
             }
         } catch (e) {
             console.error("Init error:", e);
+            // Even if DB fails, try to setup listeners for testing
+            this.setupListeners();
         }
     },
 

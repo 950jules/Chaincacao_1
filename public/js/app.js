@@ -1,14 +1,15 @@
 const app = {
     async init() {
         try {
-            console.log("ChainCacao starting...");
+            console.log("ChainCacao starting (Version Firebase)...");
             await database.init();
             offline.init();
-            auth.init();
+            await auth.init();
             
             this.setupNavigation();
             this.setupPWAInstall();
             this.refreshIcons();
+            console.log("ChainCacao initialized successfully");
         } catch (error) {
             console.error("App init error:", error);
             this.showInitError(error);

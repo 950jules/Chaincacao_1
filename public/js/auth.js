@@ -2,18 +2,23 @@ const auth = {
     currentUser: null,
 
     async init() {
+        console.log("Auth init starting...");
         // Sign in anonymously to satisfy security rules
         try {
-            await firebase.auth().signInAnonymously();
-            console.log("Firebase Auth: Signed in anonymously");
+            if (window.firebase) {
+                await firebase.auth().signInAnonymously();
+                console.log("Firebase Auth: Signed in anonymously");
+            }
         } catch (e) {
-            console.error("Firebase Auth Error:", e);
+            console.error("Firebase Auth Error (Continuing anyway):", e);
         }
 
         this.currentUser = JSON.parse(localStorage.getItem('chaincacao_user'));
         if (this.currentUser) {
+            console.log("User found in localStorage:", this.currentUser.id);
             app.initUserSession(this.currentUser);
         } else {
+            console.log("No user found, showing auth screen");
             this.showAuthScreen();
         }
     },
@@ -107,11 +112,19 @@ const auth = {
         appEl.classList.add('blurred');
 
         // Attach Event Listeners
-        document.getElementById('tab-login').onclick = () => this.switchTab('login');
-        document.getElementById('tab-register').onclick = () => this.switchTab('register');
-        document.getElementById('btn-login-submit').onclick = () => this.login();
-        document.getElementById('btn-register-submit').onclick = () => this.register();
-        document.getElementById('reg-role').onchange = () => this.updatePrefix();
+        const tLogin = document.getElementById('tab-login');
+        const tReg = document.getElementById('tab-register');
+        const bLogin = document.getElementById('btn-login-submit');
+        const bReg = document.getElementById('btn-register-submit');
+        const roleSel = document.getElementById('reg-role');
+
+        if (tLogin) tLogin.onclick = () => this.switchTab('login');
+        if (tReg) tReg.onclick = () => this.switchTab('register');
+        if (bLogin) bLogin.onclick = () => this.login();
+        if (bReg) bReg.onclick = () => this.register();
+        if (roleSel) roleSel.onchange = () => this.updatePrefix();
+        
+        console.log("Auth listeners attached");
     },
 
     switchTab(tab) {
@@ -122,50 +135,93 @@ const auth = {
     },
 
     async login() {
-        console.log("Login attempt...");
-        const id = document.getElementById('login-id').value;
-        const pass = document.getElementById('login-pass').value;
+        console.log("Click detected: login");
+        const btn = document.getElementById('btn-login-submit');
+        if (!btn) return;
+        const originalText = btn.innerText;
+        
+        try {
+            console.log("Login attempt...");
+            btn.innerText = "CONNEXION...";
+            btn.disabled = true;
 
-        const users = await database.getUsers() || [];
-        const user = users.find(u => u.id === id && u.password === pass);
+            const id = document.getElementById('login-id').value.trim();
+            const pass = document.getElementById('login-pass').value;
 
-        if (user) {
-            this.handleSuccess(user);
-        } else {
-            alert("Identifiant ou mot de passe incorrect");
+            if (!id || !pass) throw new Error("Veuillez remplir tous les champs");
+
+            const users = await database.getUsers() || [];
+            const user = users.find(u => u.id === id && u.password === pass);
+
+            if (user) {
+                this.handleSuccess(user);
+            } else {
+                throw new Error("Identifiant ou mot de passe incorrect");
+            }
+        } catch (e) {
+            console.error("Login Error:", e);
+            alert(e.message);
+        } finally {
+            btn.innerText = originalText;
+            btn.disabled = false;
         }
     },
 
     async register() {
-        console.log("Register attempt...");
-        const role = document.getElementById('reg-role').value;
-        const last = document.getElementById('reg-lastname').value;
-        const first = document.getElementById('reg-firstname').value;
-        const locality = document.getElementById('reg-locality').value;
-        const age = document.getElementById('reg-age').value;
-        const phone = document.getElementById('reg-phone').value;
-        const pass = document.getElementById('reg-pass').value;
-        const passConfirm = document.getElementById('reg-pass-confirm').value;
+        console.log("Click detected: register");
+        const btn = document.getElementById('btn-register-submit');
+        if (!btn) return;
+        const originalText = btn.innerText;
 
-        if (!phone || phone.length < 8) return alert("Numéro de téléphone invalide");
-        if (pass.length < 8) return alert("Le mot de passe doit faire au moins 8 caractères");
-        if (pass !== passConfirm) return alert("Les mots de passe ne correspondent pas");
+        try {
+            console.log("Register attempt...");
+            btn.innerText = "INSCRIPTION...";
+            btn.disabled = true;
 
-        const userId = `${role}-${phone}`;
-        const newUser = {
-            id: userId,
-            role,
-            lastname: last,
-            firstname: first,
-            locality,
-            age,
-            phone,
-            password: pass
-        };
+            const role = document.getElementById('reg-role').value;
+            const last = document.getElementById('reg-lastname').value.trim();
+            const first = document.getElementById('reg-firstname').value.trim();
+            const locality = document.getElementById('reg-locality').value;
+            const age = document.getElementById('reg-age').value;
+            const phone = document.getElementById('reg-phone').value.trim();
+            const pass = document.getElementById('reg-pass').value;
+            const passConfirm = document.getElementById('reg-pass-confirm').value;
 
-        await database.saveUser(newUser);
-        alert(`Inscription réussie ! Votre identifiant est : ${userId}`);
-        this.handleSuccess(newUser);
+            if (!last || !first || !phone || !pass) throw new Error("Tous les champs sont obligatoires");
+            if (phone.length < 8) throw new Error("Numéro de téléphone invalide (8 chiffres min)");
+            if (pass.length < 8) throw new Error("Le mot de passe doit faire au moins 8 caractères");
+            if (pass !== passConfirm) throw new Error("Les mots de passe ne correspondent pas");
+
+            const userId = `${role}-${phone}`;
+            
+            // Check existence
+            const allUsers = await database.getUsers() || [];
+            if (allUsers.some(u => u.id === userId)) {
+                throw new Error("Cet identifiant (téléphone) est déjà utilisé");
+            }
+
+            const newUser = {
+                id: userId,
+                role,
+                lastname: last,
+                firstname: first,
+                locality,
+                age,
+                phone,
+                password: pass,
+                createdAt: new Date().toISOString()
+            };
+
+            await database.saveUser(newUser);
+            alert(`Inscription réussie ! Votre identifiant est : ${userId}`);
+            this.handleSuccess(newUser);
+        } catch (e) {
+            console.error("Register Error:", e);
+            alert(e.message);
+        } finally {
+            btn.innerText = originalText;
+            btn.disabled = false;
+        }
     },
 
     handleSuccess(user) {
