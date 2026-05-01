@@ -1,5 +1,13 @@
 const app = {
     async init() {
+        // Failsafe: if after 10s we haven't loaded, force reveal the app
+        setTimeout(() => {
+            if (!document.body.classList.contains('loaded')) {
+                console.warn("Failsafe: Forced load triggered after timeout");
+                this.setLoaded();
+            }
+        }, 8000);
+
         try {
             console.log("ChainCacao starting (Version Firebase)...");
             await database.init();
@@ -10,6 +18,7 @@ const app = {
             this.setupPWAInstall();
             this.refreshIcons();
             console.log("ChainCacao initialized successfully");
+            this.setLoaded();
         } catch (error) {
             console.error("App init error:", error);
             this.showInitError(error);
@@ -187,7 +196,6 @@ const app = {
 };
 
 window.onload = () => {
-    app.init().then(() => {
-        app.setLoaded();
-    });
+    console.log("Window loaded, starting app...");
+    app.init();
 };

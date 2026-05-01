@@ -682,3 +682,12 @@ main {
 .gap-warning { color: var(--warning); }
 .gap-danger { color: var(--danger); }
 
+.auth-status-msg {
+    text-align: center;
+    font-size: 0.85rem;
+    font-weight: 700;
+    margin-bottom: 15px;
+    min-height: 20px;
+    transition: all 0.3s;
+}
+

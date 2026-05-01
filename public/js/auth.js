@@ -4,13 +4,11 @@ const auth = {
     async init() {
         console.log("Auth init starting...");
         // Sign in anonymously to satisfy security rules
-        try {
-            if (window.firebase) {
-                await firebase.auth().signInAnonymously();
-                console.log("Firebase Auth: Signed in anonymously");
-            }
-        } catch (e) {
-            console.error("Firebase Auth Error (Continuing anyway):", e);
+        // Non-blocking call
+        if (window.firebase) {
+            firebase.auth().signInAnonymously()
+                .then(() => console.log("Firebase Auth: Signed in anonymously"))
+                .catch(e => console.error("Firebase Auth Error (Silenced):", e));
         }
 
         this.currentUser = JSON.parse(localStorage.getItem('chaincacao_user'));
@@ -51,6 +49,7 @@ const auth = {
                         <label>Mot de passe</label>
                         <input type="password" id="login-pass" placeholder="••••••••">
                     </div>
+                    <div id="auth-msg" class="auth-status-msg"></div>
                     <button class="btn btn-primary" id="btn-login-submit">SE CONNECTER</button>
                 </div>
 
@@ -137,11 +136,13 @@ const auth = {
     async login() {
         console.log("Click detected: login");
         const btn = document.getElementById('btn-login-submit');
+        const msg = document.getElementById('auth-msg');
         if (!btn) return;
         const originalText = btn.innerText;
         
         try {
-            console.log("Login attempt...");
+            msg.innerText = "Vérification de l'identité...";
+            msg.style.color = "#8D5B3E";
             btn.innerText = "CONNEXION...";
             btn.disabled = true;
 
@@ -150,17 +151,24 @@ const auth = {
 
             if (!id || !pass) throw new Error("Veuillez remplir tous les champs");
 
-            const users = await database.getUsers() || [];
-            const user = users.find(u => u.id === id && u.password === pass);
+            // Timeout for database
+            const usersPromise = database.getUsers();
+            const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error("Délai de connexion dépassé. Vérifiez votre réseau.")), 15000));
+            
+            const usersList = await Promise.race([usersPromise, timeoutPromise]) || [];
+            const user = usersList.find(u => u.id === id && u.password === pass);
 
             if (user) {
-                this.handleSuccess(user);
+                msg.innerText = "Succès ! Redirection...";
+                msg.style.color = "#388E3C";
+                setTimeout(() => this.handleSuccess(user), 500);
             } else {
                 throw new Error("Identifiant ou mot de passe incorrect");
             }
         } catch (e) {
             console.error("Login Error:", e);
-            alert(e.message);
+            msg.innerText = e.message;
+            msg.style.color = "#D32F2F";
         } finally {
             btn.innerText = originalText;
             btn.disabled = false;
@@ -170,11 +178,16 @@ const auth = {
     async register() {
         console.log("Click detected: register");
         const btn = document.getElementById('btn-register-submit');
+        const msg = document.getElementById('auth-msg'); // Using same msg area if visible or adding to reg
         if (!btn) return;
         const originalText = btn.innerText;
 
         try {
             console.log("Register attempt...");
+            if (msg) {
+                msg.innerText = "Création du compte...";
+                msg.style.color = "#8D5B3E";
+            }
             btn.innerText = "INSCRIPTION...";
             btn.disabled = true;
 
@@ -213,11 +226,19 @@ const auth = {
             };
 
             await database.saveUser(newUser);
-            alert(`Inscription réussie ! Votre identifiant est : ${userId}`);
-            this.handleSuccess(newUser);
+            if (msg) {
+                msg.innerText = "Compte créé ! Connexion...";
+                msg.style.color = "#388E3C";
+            }
+            setTimeout(() => this.handleSuccess(newUser), 1000);
         } catch (e) {
             console.error("Register Error:", e);
-            alert(e.message);
+            if (msg) {
+                msg.innerText = e.message;
+                msg.style.color = "#D32F2F";
+            } else {
+                alert(e.message);
+            }
         } finally {
             btn.innerText = originalText;
             btn.disabled = false;

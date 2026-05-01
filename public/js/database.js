@@ -28,9 +28,13 @@ const database = {
                 app = firebase.app();
             }
 
-            // In compat SDK, firebase.app().firestore() is usually used
-            // Multi-database support in compat is limited, so we use the default or what's configured
-            db = firebase.firestore();
+            // Use the specific Database ID if provided, otherwise default
+            if (firebaseConfig.firestoreDatabaseId) {
+                console.log("Tentative d'accès à la DB:", firebaseConfig.firestoreDatabaseId);
+                db = app.firestore(firebaseConfig.firestoreDatabaseId);
+            } else {
+                db = app.firestore();
+            }
 
             console.log("Firestore ready");
         } catch (e) {
