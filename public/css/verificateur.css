@@ -1,8 +1,8 @@
 .verify-result-header h2 {
     font-family: var(--font-heading);
-    font-size: 1.8rem;
+    font-size: 1.4rem;
     font-weight: 800;
-    margin-bottom: 1.5rem;
+    margin-bottom: 1rem;
     letter-spacing: -0.04em;
     color: var(--primary);
 }
@@ -10,14 +10,14 @@
 /* Timeline */
 .timeline {
     position: relative;
-    padding-left: 2.5rem;
-    margin: 2.5rem 0;
+    padding-left: 2rem;
+    margin: 1.5rem 0;
 }
 
 .timeline::before {
     content: '';
     position: absolute;
-    left: 11px;
+    left: 8px;
     top: 5px;
     bottom: 5px;
     width: 2px;
@@ -26,28 +26,28 @@
 
 .timeline-event {
     position: relative;
-    margin-bottom: 2.5rem;
+    margin-bottom: 1.5rem;
 }
 
 .timeline-dot {
     position: absolute;
-    left: -2.2rem;
+    left: -1.75rem;
     top: 6px;
-    width: 14px;
-    height: 14px;
+    width: 12px;
+    height: 12px;
     background: var(--success);
     border-radius: 50%;
     z-index: 1;
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 0 0 5px rgba(45, 90, 27, 0.1);
+    box-shadow: 0 0 0 4px rgba(137, 187, 7, 0.1);
 }
 
 .timeline-content {
     background: var(--white);
-    padding: 1.5rem;
-    border-radius: 20px;
+    padding: 1rem;
+    border-radius: 16px;
     box-shadow: var(--shadow);
     border: none;
 }
@@ -84,13 +84,13 @@
 .eudr-badge {
     background: var(--success);
     color: white;
-    padding: 1.75rem;
-    border-radius: 24px;
+    padding: 1.25rem;
+    border-radius: 20px;
     display: flex;
     align-items: center;
-    gap: 1.25rem;
-    margin-bottom: 2rem;
-    box-shadow: 0 15px 30px rgba(45, 90, 27, 0.25);
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 10px 20px rgba(137, 187, 7, 0.2);
 }
 
 .eudr-badge strong {

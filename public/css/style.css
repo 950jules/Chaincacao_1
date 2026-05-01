@@ -1,16 +1,16 @@
 :root {
     --bg-main: #FCF9F5;
     --bg-card: #FFFFFF;
-    --primary: #5D2E17; /* Vibrant Coffee */
-    --success: #388E3C; /* Vibrant Green */
+    --primary: #C06722; /* Warm Coffee */
+    --success: #89BB07; /* Vibrant Green */
     --warning: #FBC02D;
     --danger: #D32F2F;
     --accent: #E67E22;
-    --secondary: #8D5B3E;
+    --secondary: #A85311;
     --text-main: #2C1810;
     --white: #FFFFFF;
     --gray: #E0D3C1;
-    --shadow: 0 10px 30px rgba(93, 46, 23, 0.08);
+    --shadow: 0 10px 30px rgba(192, 103, 34, 0.08);
     --border-radius: 20px;
     --font-heading: 'Outfit', sans-serif;
     --font-body: 'Plus Jakarta Sans', sans-serif;
@@ -679,5 +679,5 @@ main {
 }
 
 .gap-ok { color: var(--success); }
-.gap-warning { color: #E67E22; }
-.gap-danger { color: var(--accent); }
+.gap-warning { color: var(--warning); }
+.gap-danger { color: var(--danger); }

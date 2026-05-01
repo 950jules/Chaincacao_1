@@ -15,11 +15,11 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background: rgba(45, 90, 27, 0.05);
+    background: rgba(137, 187, 7, 0.1);
     padding: 1rem;
     border-radius: 16px;
     margin: 1.5rem 0;
-    border: 1px solid rgba(45, 90, 27, 0.1);
+    border: 1px solid rgba(137, 187, 7, 0.2);
 }
 
 .weight-diff {

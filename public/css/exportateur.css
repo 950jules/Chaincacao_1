@@ -21,7 +21,7 @@
     font-weight: 800;
     text-transform: uppercase;
     color: var(--secondary);
-    border: 1.5px solid rgba(61, 26, 10, 0.1);
+    border: 1.5px solid rgba(192, 103, 34, 0.1);
     font-family: var(--font-heading);
     letter-spacing: 0.05em;
     box-shadow: var(--shadow);
@@ -51,17 +51,17 @@
 
 .selection-summary {
     position: fixed;
-    bottom: 7.5rem;
+    bottom: 7rem;
     left: 1.5rem;
     right: 1.5rem;
     background: var(--primary);
     color: white;
-    padding: 1.5rem 1.75rem;
+    padding: 1rem 1.5rem;
     border-radius: 100px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    box-shadow: 0 20px 40px rgba(61, 26, 10, 0.4);
+    box-shadow: 0 20px 40px rgba(192, 103, 34, 0.4);
     z-index: 95;
     font-family: var(--font-heading);
 }
@@ -74,7 +74,7 @@
 }
 
 #sel-weight {
-    font-size: 1.5rem;
+    font-size: 1.25rem;
     font-weight: 800;
     letter-spacing: -0.04em;
 }
