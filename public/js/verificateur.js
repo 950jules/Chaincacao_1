@@ -9,16 +9,18 @@ const verificateur = {
         this.renderGlobalDashboard();
 
         // Ajout du bouton scan dynamique avec layout amélioré
-        const searchBox = document.querySelector('#screen-verificateur .search-box');
-        if (searchBox && !document.getElementById('verify-scan')) {
+        const screen = document.getElementById('screen-verificateur');
+        if (screen && !document.getElementById('verify-scan')) {
             const scanBtn = document.createElement('button');
             scanBtn.id = 'verify-scan';
             scanBtn.className = 'btn-scan-main';
-            scanBtn.innerHTML = '<i data-lucide="camera"></i> SCAN';
+            scanBtn.innerHTML = '<i data-lucide="camera"></i> SCANNER UN LOT';
             
-            // Insérer au début du container verificateur pour le design "plein écran"
-            const verifScreen = document.getElementById('screen-verificateur');
-            verifScreen.insertBefore(scanBtn, verifScreen.firstChild);
+            // Placer le bouton scan en évidence
+            const searchBox = screen.querySelector('.search-box');
+            if (searchBox) {
+                screen.insertBefore(scanBtn, searchBox);
+            }
             
             scanBtn.onclick = async () => {
                 const code = await camera.scanQR();

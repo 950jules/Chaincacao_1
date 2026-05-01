@@ -16,13 +16,17 @@ const offline = {
         const banner = document.getElementById('offline-banner');
         
         if (navigator.onLine) {
-            badge.innerText = "En ligne";
-            badge.className = "status-badge online";
-            banner.classList.add('hidden');
+            if (badge) {
+                badge.innerText = "";
+                badge.className = "status-badge online hidden";
+            }
+            if (banner) banner.classList.add('hidden');
         } else {
-            badge.innerText = "Hors-ligne";
-            badge.className = "status-badge";
-            banner.classList.remove('hidden');
+            if (badge) {
+                badge.innerText = "Hors-ligne";
+                badge.className = "status-badge";
+            }
+            if (banner) banner.classList.remove('hidden');
         }
     }
 };

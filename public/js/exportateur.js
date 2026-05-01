@@ -45,7 +45,7 @@ const exportateur = {
                             <div class="card-footer" style="margin-top:4px">
                                 <span>${lot.species}</span>
                                 <span class="dot">•</span>
-                                <span style="color:var(--success); font-weight:800; font-size:9px">EUDR ✓</span>
+                                <span style="color:var(--success); font-weight:800; font-size:9px">EUDR CONFORME</span>
                             </div>
                         </div>
                     </div>

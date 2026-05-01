@@ -12,7 +12,7 @@ const demo = {
             this.isActive = true;
             this.renderUI();
             this.prepareDemoData();
-            console.log("🎬 Mode Démo Activé");
+            console.log("Mode Démo Activé");
         }
     },
 
@@ -20,7 +20,7 @@ const demo = {
         // Bouton flottant
         const floatBtn = document.createElement('div');
         floatBtn.id = 'demo-float-btn';
-        floatBtn.innerHTML = '🎬 LANCER LA DÉMO';
+        floatBtn.innerHTML = 'LANCER LA DÉMO';
         floatBtn.className = 'demo-btn-main';
         floatBtn.onclick = () => this.start();
         document.body.appendChild(floatBtn);
@@ -34,8 +34,8 @@ const demo = {
                 <div id="demo-progress-bar" class="progress-fill"></div>
             </div>
             <div class="demo-controls">
-                <button onclick="demo.reset()">🔄 RESET</button>
-                <button id="demo-pause-btn" onclick="demo.togglePause()">⏸️ PAUSE</button>
+                <button onclick="demo.reset()">RESET</button>
+                <button id="demo-pause-btn" onclick="demo.togglePause()">PAUSE</button>
                 <select onchange="demo.setSpeed(this.value)">
                     <option value="1">Vitesse x1</option>
                     <option value="2">Vitesse x2</option>
@@ -70,7 +70,7 @@ const demo = {
 
     togglePause() {
         this.isPaused = !this.isPaused;
-        document.getElementById('demo-pause-btn').innerHTML = this.isPaused ? '▶️ REPRENDRE' : '⏸️ PAUSE';
+        document.getElementById('demo-pause-btn').innerHTML = this.isPaused ? 'REPRENDRE' : 'PAUSE';
     },
 
     setSpeed(s) {
@@ -147,7 +147,7 @@ const demo = {
 
         // Étape 2: GPS
         agriculteur.formState.data.gps = { lat: 6.9075, lng: 0.6339 };
-        document.getElementById('f-gps-display').innerHTML = "📍 GPS: 6.9075, 0.6339 (Fixé)";
+        document.getElementById('f-gps-display').innerHTML = "GPS: 6.9075, 0.6339 (Fixé)";
         this.highlight('#btn-gps-capture');
         await this.wait(1000);
 
@@ -235,7 +235,7 @@ const demo = {
         const summary = document.createElement('div');
         summary.className = 'demo-summary';
         summary.innerHTML = `
-            <h2>🎊 Démo Terminée !</h2>
+            <h2>Démo Terminée !</h2>
             <p>Le lot a parcouru toute la chaîne en 8 secondes (simulées).</p>
             <p>Toutes les étapes sont inscrites sur <b>Polygon Mainnet</b> (simulé).</p>
             <button onclick="location.reload()">RETOUR AU MODE RÉEL</button>

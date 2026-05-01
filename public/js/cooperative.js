@@ -212,7 +212,7 @@ const cooperative = {
                         </div>
                         <div style="display:flex; flex-direction:column; align-items:flex-end; gap:4px">
                             <span class="badge badge-success">${t.data.grade}</span>
-                            <span style="font-size:9px; font-weight:800; color:var(--success); text-transform:uppercase">✅ CERTIFIÉ EUDR</span>
+                            <span style="font-size:9px; font-weight:800; color:var(--success); text-transform:uppercase">CERTIFIÉ EUDR</span>
                         </div>
                     </div>
                 `).join('')}

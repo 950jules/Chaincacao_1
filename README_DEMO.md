@@ -1,4 +1,4 @@
-# 🍫 ChainCacao - Mode Démo Automatique
+# ChainCacao - Mode Démo Automatique
 
 Cette application inclut un moteur de démonstration permettant de simuler tout le cycle de vie d'un lot de cacao en quelques secondes.
 
@@ -23,7 +23,7 @@ Chaque étape de la démo génère un hash de transaction et un numéro de bloc 
 
 ## Installation PWA
 
-L'application détecte si elle peut être installée et affiche un bouton **"📱 INSTALLER"** dans l'en-tête sur les navigateurs compatibles (Chrome Android notamment).
+L'application détecte si elle peut être installée et affiche un bouton **"INSTALLER"** dans l'en-tête sur les navigateurs compatibles (Chrome Android notamment).
 
 ---
 © 2026 ChainCacao v2 - Traçabilité Transparente.

@@ -112,24 +112,3 @@
 .blurred {
     filter: blur(10px);
 }
-
-.auth-form button {
-    width: 100%;
-    padding: 12px;
-    background: var(--primary);
-    color: white;
-    border: none;
-    border-radius: 12px;
-    font-size: 0.9rem;
-    font-weight: 700;
-    cursor: pointer;
-    transition: background 0.3s;
-}
-
-.auth-form button:active {
-    transform: scale(0.98);
-}
-
-.auth-form button:hover {
-    background: var(--primary-dark);
-}

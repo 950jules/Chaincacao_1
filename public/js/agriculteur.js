@@ -156,7 +156,7 @@ const agriculteur = {
             
             display.innerHTML = `
                 <div class="gps-success">
-                    ✅ POSITION CAPTURÉE<br>
+                    POSITION CAPTURÉE<br>
                     <small>${pos.lat.toFixed(5)}°, ${pos.lng.toFixed(5)}°</small>
                 </div>
             `;
@@ -164,10 +164,10 @@ const agriculteur = {
             window.ChainCacaoGPS.displayMiniMap('mini-map', pos.lat, pos.lng);
             
         } catch (e) { 
-            display.innerHTML = `<div class="gps-error">❌ ${e.message}</div>`;
+            display.innerHTML = `<div class="gps-error">ERREUR GPS : ${e.message}</div>`;
         } finally {
             btn.disabled = false;
-            btn.innerHTML = `📍 RE-CAPTURER POSITION`;
+            btn.innerHTML = `<i data-lucide="map-pin"></i> RE-CAPTURER POSITION`;
         }
     },
 
