@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="ChainCacao — Vérifiez la conformité EUDR et la traçabilité blockchain des lots de cacao togolais." />
+  <title>ChainCacao — Vérificateur EUDR Public</title>
+
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🍫</text></svg>" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+
+<body>
+
+  <!-- ══ HEADER ══ -->
+  <header class="site-header">
+    <div class="header-inner">
+      <a class="logo" href="#">
+        <div class="logo-box">🍫</div>
+        <div class="logo-text">
+          <h1>ChainCacao</h1>
+          <p>Vérificateur EUDR</p>
+        </div>
+      </a>
+      <span class="header-badge">🇪🇺 EUDR Reg. 2023/1115</span>
+    </div>
+  </header>
+
+  <!-- ══ HERO ══ -->
+  <section class="hero">
+    <div class="hero-inner">
+      <h2>Vérifiez la traçabilité<br>du <em>cacao togolais</em></h2>
+      <p>Scannez ou saisissez l'identifiant d'un lot pour consulter son parcours complet — de la parcelle de l'agriculteur jusqu'au port d'export.</p>
+    </div>
+  </section>
+
+  <!-- ══ MAIN ══ -->
+  <main class="page-wrap">
+
+    <!-- RECHERCHE -->
+    <section class="search-section">
+      <div class="search-card">
+
+        <div class="mode-tabs" role="tablist">
+          <button id="tab-search" class="tab-btn active" role="tab">
+            🔍 Saisir un ID
+          </button>
+          <button id="tab-scan" class="tab-btn" role="tab">
+            📷 Scanner QR Code
+          </button>
+        </div>
+
+        <!-- Mode saisie -->
+        <div id="search-panel" role="tabpanel">
+          <div class="search-input-wrap">
+            <span class="search-icon">🆔</span>
+            <input
+              type="text"
+              id="search-input"
+              placeholder="Ex : CC-2026-DEMO01"
+              autocomplete="off"
+              autocorrect="off"
+              spellcheck="false"
+              aria-label="Identifiant du lot de cacao"
+            />
+          </div>
+          <button id="btn-search">
+            <span>🔍</span> Vérifier
+          </button>
+        </div>
+
+        <!-- Mode scan -->
+        <div id="scan-panel" role="tabpanel" style="display:none;">
+          <div id="qr-reader"></div>
+          <p id="scan-status" class="scan-status scanning">
+            Cliquez sur "Démarrer" pour activer la caméra
+          </p>
+        </div>
+
+        <!-- Spinner -->
+        <div id="loading-spinner">
+          <div class="spinner"></div>
+          <span>Interrogation de la blockchain…</span>
+        </div>
+
+        <!-- Erreur -->
+        <div id="error-box" role="alert"></div>
+
+      </div>
+    </section>
+
+    <!-- ══ RÉSULTATS ══ -->
+    <section id="results-container" aria-live="polite">
+
+      <div class="result-header">
+        <h2 class="result-title">Résultat de vérification</h2>
+        <div class="result-actions">
+          <button id="btn-share" class="btn-action btn-share">🔗 Partager</button>
+        </div>
+      </div>
+
+      <!-- Badge EUDR -->
+      <div id="eudr-badge" class="eudr-badge"></div>
+
+      <!-- Infos lot -->
+      <div class="card">
+        <div class="card-header-bar">
+          <span>📋</span>
+          <h3 class="card-title">Informations du Lot</h3>
+        </div>
+        <div class="card-body">
+          <div id="lot-info"></div>
+        </div>
+      </div>
+
+      <!-- Timeline -->
+      <div class="card">
+        <div class="card-header-bar">
+          <span>⛓️</span>
+          <h3 class="card-title">Parcours Blockchain</h3>
+        </div>
+        <div class="timeline-container" id="timeline-container"></div>
+      </div>
+
+      <!-- Carte GPS -->
+      <div class="card" id="map-section">
+        <div class="card-header-bar">
+          <span>📍</span>
+          <h3 class="card-title">Localisation de la Parcelle</h3>
+        </div>
+        <div id="map-container"></div>
+        <div class="map-actions">
+          <button class="btn-maps" id="btn-open-gmaps">
+            🗺️ Ouvrir dans Google Maps
+          </button>
+        </div>
+      </div>
+
+      <!-- Photo -->
+      <div class="card" id="photo-section">
+        <div class="card-header-bar">
+          <span>📸</span>
+          <h3 class="card-title">Photo du Lot</h3>
+        </div>
+        <img id="lot-photo" alt="Photo du sac de cacao" />
+      </div>
+
+      <!-- QR Partage -->
+      <div class="card">
+        <div class="card-header-bar">
+          <span>📤</span>
+          <h3 class="card-title">Partage &amp; Vérification</h3>
+        </div>
+        <div class="share-section-inner">
+          <div id="share-qr"></div>
+          <div class="share-info">
+            <h4>Lien de vérification public</h4>
+            <p>Scannez ce QR code ou copiez le lien pour partager la traçabilité avec un importateur ou un service douanier.</p>
+            <button class="btn-action btn-share" onclick="verifierApp._shareLot()">
+              🔗 Copier le lien
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- PDF -->
+      <button id="btn-pdf" onclick="verifierApp.downloadPDF()">
+        <span>📄</span> Télécharger Certificat EUDR (PDF)
+      </button>
+
+    </section>
+
+    <!-- ══ REGISTRE PUBLIC ══ -->
+    <section id="registry-section" style="display:none;">
+      <div class="registry-title-bar">
+        <h3 class="registry-title">Registre des Lots Exportés</h3>
+        <span class="registry-count-badge" id="registry-count">0</span>
+      </div>
+      <div class="registry-grid" id="registry-list"></div>
+    </section>
+
+  </main>
+
+  <!-- ══ FOOTER ══ -->
+  <footer class="site-footer">
+    <p>
+      <strong>ChainCacao</strong> — Traçabilité blockchain du cacao togolais<br>
+      Conformité <strong>Règlement EUDR UE 2023/1115</strong><br>
+      <a href="https://gen-lang-client-0846821407.web.app" style="color:rgba(255,255,255,0.4);">
+        gen-lang-client-0846821407.web.app
+      </a>
+    </p>
+  </footer>
+
+  <!-- Toast -->
+  <div id="toast" role="status" aria-live="polite"></div>
+
+  <!-- ══ SCRIPTS ══ -->
+
+  <!-- Leaflet -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+  <!-- html5-qrcode (scanner caméra) -->
+  <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+
+  <!-- qrcode.js (générateur QR) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+  <!-- jsPDF (certificat) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+  <!-- Config Firebase (synchrone) -->
+  <script src="js/firebase-config.js"></script>
+
+  <!-- Autres modules ChainCacao (synchrones, pas de Firebase dedans encore) -->
+  <script src="js/qrcode-scanner.js"></script>
+  <script src="js/timeline.js"></script>
+  <script src="js/map.js"></script>
+  <script src="js/pdf-generator.js"></script>
+  <script src="js/firebase-service.js"></script>
+  <script src="js/app.js"></script>
+
+  <!-- Firebase SDK Modulaire ESM (async, déclenche init après chargement) -->
+  <script type="module">
+    import { initializeApp, getApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+    import {
+      getFirestore, collection, doc, getDoc, getDocs,
+      query, orderBy, where, limit
+    } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+
+    // Exposer globalement pour firebase-service.js (mode non-module)
+    window.firebaseModular = {
+      app: { initializeApp, getApp },
+      firestore: { getFirestore, collection, doc, getDoc, getDocs, query, orderBy, where, limit }
+    };
+
+    // Démarrer l'application une fois Firebase prêt
+    await verifierApp.init();
+  </script>
+
+  <!-- Listener Google Maps button -->
+  <script>
+    document.getElementById('btn-open-gmaps').addEventListener('click', () => {
+      const lot = verifierApp.currentLot;
+      if (lot && lot.gps) mapModule.openExternalMap(lot.gps.lat, lot.gps.lng);
+    });
+  </script>
+
+</body>
+</html>
