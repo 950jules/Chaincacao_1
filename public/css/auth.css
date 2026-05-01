@@ -1,0 +1,135 @@
+#auth-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(61, 26, 10, 0.4);
+    backdrop-filter: blur(8px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 100000;
+    padding: 20px;
+}
+
+.auth-card {
+    background: #F5EFE6;
+    width: 100%;
+    max-width: 400px;
+    padding: 2rem;
+    border-radius: 32px;
+    box-shadow: 0 30px 60px rgba(0,0,0,0.3);
+    border: 1px solid rgba(255,255,255,0.5);
+}
+
+.auth-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.auth-header .logo-box {
+    width: 60px;
+    height: 60px;
+    background: var(--primary);
+    color: white;
+    font-size: 30px;
+    font-weight: 800;
+    margin: 0 auto 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 18px;
+}
+
+.auth-header h1 {
+    font-family: var(--font-heading);
+    font-weight: 800;
+    color: var(--primary);
+    margin: 0;
+}
+
+.auth-header p {
+    font-size: 0.8rem;
+    color: var(--secondary);
+    font-weight: 600;
+}
+
+.auth-tabs {
+    display: flex;
+    background: var(--bg-main);
+    padding: 4px;
+    border-radius: 16px;
+    margin-bottom: 1.5rem;
+}
+
+.auth-tabs button {
+    flex: 1;
+    padding: 10px;
+    border: none;
+    background: transparent;
+    border-radius: 12px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--secondary);
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.auth-tabs button.active {
+    background: white;
+    color: var(--primary);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+.auth-form .input-group {
+    margin-bottom: 1rem;
+}
+
+.auth-form label {
+    display: block;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--secondary);
+    margin-bottom: 6px;
+}
+
+.auth-form input, .auth-form select {
+    width: 100%;
+    padding: 12px 16px;
+    border-radius: 12px;
+    border: 1.5px solid var(--gray);
+    background: white;
+    font-size: 0.9rem;
+    font-family: inherit;
+}
+
+.auth-form input:focus {
+    outline: none;
+    border-color: var(--primary);
+}
+
+.blurred {
+    filter: blur(10px);
+}
+
+.auth-form button {
+    width: 100%;
+    padding: 12px;
+    background: var(--primary);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-size: 0.9rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.auth-form button:active {
+    transform: scale(0.98);
+}
+
+.auth-form button:hover {
+    background: var(--primary-dark);
+}

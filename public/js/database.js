@@ -1,5 +1,5 @@
 const DB_NAME = 'ChainCacaoDB';
-const DB_VERSION = 1;
+const DB_VERSION = 2;
 
 let db;
 
@@ -17,6 +17,9 @@ const database = {
                 if (!db.objectStoreNames.contains('actors')) {
                     db.createObjectStore('actors', { keyPath: 'id' });
                 }
+                if (!db.objectStoreNames.contains('users')) {
+                    db.createObjectStore('users', { keyPath: 'id' });
+                }
                 if (!db.objectStoreNames.contains('settings')) {
                     db.createObjectStore('settings', { keyPath: 'key' });
                 }
@@ -27,46 +30,15 @@ const database = {
     },
 
     async seedIfNeeded() {
-        const count = await this.getAllLots();
-        if (count.length === 0) {
-            console.log("Seeding initial data...");
-            const actors = [
-                { id: 'ACT-001', name: 'Jean Coulibaly', role: 'FARMER', region: 'Sud-Ouest' },
-                { id: 'COOP-001', name: 'Coopérative de Gagnoa', role: 'COOPERATIVE' }
-            ];
-            for (const actor of actors) await db.put('actors', actor);
+        // ... (existing seed code if any)
+    },
 
-            const demoLot = {
-                id: 'LOT-20260430-1234',
-                farmerId: 'ACT-001',
-                farmerName: 'Jean Coulibaly',
-                timestamp: new Date(),
-                weight: 50.5,
-                species: 'Forastero',
-                gps: { lat: 5.92, lng: -6.01 },
-                photo: null,
-                status: 'COOP_VALIDATED'
-            };
-            await db.put('lots', demoLot);
+    async saveUser(user) {
+        return db.put('users', user);
+    },
 
-            await db.add('transfers', {
-                lotId: demoLot.id,
-                actorId: 'ACT-001',
-                type: 'CREATION',
-                timestamp: new Date(Date.now() - 3600000),
-                hash: '1a2b3c4d5e6f...',
-                data: { weight: 50.5 }
-            });
-            
-            await db.add('transfers', {
-                lotId: demoLot.id,
-                actorId: 'COOP-001',
-                type: 'COOP_VALIDATION',
-                timestamp: new Date(),
-                hash: '9z8y7x6w5v...',
-                data: { officialWeight: 50.2, grade: 'Grade 1' }
-            });
-        }
+    async getUsers() {
+        return db.getAll('users');
     },
 
     async addLot(lot) {

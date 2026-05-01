@@ -8,16 +8,18 @@ const verificateur = {
         // Render Compliance Dashboard
         this.renderGlobalDashboard();
 
-        // Ajout du bouton scan dynamique
+        // Ajout du bouton scan dynamique avec layout amélioré
         const searchBox = document.querySelector('#screen-verificateur .search-box');
         if (searchBox && !document.getElementById('verify-scan')) {
             const scanBtn = document.createElement('button');
             scanBtn.id = 'verify-scan';
-            scanBtn.innerHTML = '📷 SCAN';
-            scanBtn.classList.add('btn', 'btn-outline');
-            scanBtn.style.padding = '0 1rem';
-            scanBtn.style.height = '100%';
-            scanBtn.style.flex = '0 0 auto';
+            scanBtn.className = 'btn-scan-main';
+            scanBtn.innerHTML = '<i data-lucide="camera"></i> SCAN';
+            
+            // Insérer au début du container verificateur pour le design "plein écran"
+            const verifScreen = document.getElementById('screen-verificateur');
+            verifScreen.insertBefore(scanBtn, verifScreen.firstChild);
+            
             scanBtn.onclick = async () => {
                 const code = await camera.scanQR();
                 if (code) {
@@ -25,8 +27,8 @@ const verificateur = {
                     this.verifyLot(code);
                 }
             };
-            searchBox.appendChild(scanBtn);
         }
+        app.refreshIcons();
     },
 
     async renderGlobalDashboard() {
@@ -38,7 +40,7 @@ const verificateur = {
             container.classList.remove('hidden');
             container.innerHTML = `
                 <div class="stats-grid" style="margin-bottom: 2rem">
-                    <div class="stat-item" style="background:var(--success); color:white">
+                    <div class="stat-item" style="background:var(--primary); color:white">
                         <span class="l">Lots Exportés</span>
                         <span class="v">${exportLots.length}</span>
                     </div>
@@ -48,19 +50,23 @@ const verificateur = {
                     </div>
                 </div>
                 
-                <h3 style="margin-bottom: 1rem">Registre d'Exportation</h3>
+                <h3 class="section-title">Registre d'Exportation</h3>
                 <div class="history-list">
                     ${exportLots.map(lot => `
-                        <div class="history-item" onclick="verificateur.verifyLot('${lot.id}')" style="cursor:pointer">
-                            <div class="history-info">
-                                <div class="id">${lot.id}</div>
-                                <div class="date">Container: ${lot.containerId || 'N/A'}</div>
+                        <div class="card" onclick="verificateur.verifyLot('${lot.id}')">
+                            <div class="card-header">
+                                <strong class="lot-id">${lot.id}</strong>
+                                <span class="badge badge-success">EUDR CERTIFIED</span>
                             </div>
-                            <span class="badge badge-success">EUDR CERTIFIED</span>
+                            <div class="card-footer">
+                                <i data-lucide="package" style="width:12px; height:12px"></i>
+                                <span>Container: ${lot.containerId || 'N/A'}</span>
+                            </div>
                         </div>
                     `).join('')}
                 </div>
             `;
+            app.refreshIcons();
         }
     },
 
@@ -80,7 +86,9 @@ const verificateur = {
             <div class="card verify-result-header">
                 <h2>Lot ${lot.id}</h2>
                 <div class="eudr-badge">
-                   <span style="font-size: 2.5rem">🍃</span>
+                   <div class="eudr-icon-box">
+                       <i data-lucide="leaf"></i>
+                   </div>
                    <div>
                         <strong>CERTIFIÉ CONFORME EUDR</strong>
                         <p style="font-size: 0.75rem; opacity: 0.8; margin-top: 2px">Zéro Déforestation • Géo-localisé • Blockchain</p>
@@ -89,15 +97,18 @@ const verificateur = {
 
                 <div id="map-verify"></div>
                 
-                <h3 style="font-family:var(--font-heading); margin: 2rem 0 1rem; font-weight:800; color:var(--primary)">Parcours Blockchain</h3>
+                <h3 class="section-title">Parcours Blockchain</h3>
                 <div class="timeline">
                     ${transfers.map(t => `
                         <div class="timeline-event">
-                            <div class="timeline-dot">🔒</div>
+                            <div class="timeline-dot"><i data-lucide="shield-check"></i></div>
                             <div class="timeline-content">
                                 <span class="actor">${t.actorId}</span>
                                 <h4>${t.type === 'CREATION' ? 'Récolte Enregistrée' : t.type === 'COOP_VALIDATION' ? 'Collecte & Contrôle' : 'Manifeste Export'}</h4>
-                                <div style="font-size: 0.7rem; color: var(--secondary); font-weight:600">${utils.formatDate(t.timestamp)}</div>
+                                <div class="timeline-meta">
+                                    <i data-lucide="clock"></i>
+                                    <span>${utils.formatDate(t.timestamp)}</span>
+                                </div>
                                 <div class="tx-hash">HASH: ${t.hash.substring(0, 24)}...</div>
                             </div>
                         </div>
@@ -105,25 +116,30 @@ const verificateur = {
                 </div>
 
                 <div class="card" style="margin-top: 2rem; border-top: 4px solid var(--primary)">
-                    <h3 style="font-family:var(--font-heading); margin-bottom: 1rem; font-size:1rem; font-weight:800">Fiche de Traçabilité</h3>
-                    <p style="font-size:0.9rem; margin-bottom:0.5rem"><strong>Espèce:</strong> ${lot.species}</p>
-                    <p style="font-size:0.9rem; margin-bottom:0.5rem"><strong>Poids final:</strong> ${lot.weight}kg</p>
+                    <h3 class="section-title" style="margin-top:0">Fiche de Traçabilité</h3>
+                    <p style="font-size:0.9rem; margin-bottom:0.8rem">
+                        <strong>Espèce:</strong> ${lot.species}<br>
+                        <strong>Poids final:</strong> ${lot.weight}kg<br>
+                        <strong>Localité:</strong> ${lot.region}
+                    </p>
                     <div style="display:grid; grid-template-columns: 1fr 1fr; gap:0.5rem; margin-top:1.5rem">
                          <div style="text-align:center">
-                            <p style="font-size:10px; font-weight:800; color:var(--secondary); text-transform:uppercase; margin-bottom:4px">Photo Sac</p>
-                            ${lot.photo ? `<img src="${lot.photo}" style="width:100%; border-radius:12px">` : '<div style="height:80px; background:var(--bg-main); border-radius:12px; display:flex; align-items:center; justify-content:center">📦</div>'}
+                            <p class="small-label">Photo Sac</p>
+                            ${lot.photo ? `<img src="${lot.photo}" style="width:100%; border-radius:12px">` : '<div class="placeholder-box"><i data-lucide="package"></i></div>'}
                          </div>
                          <div style="text-align:center">
-                            <p style="font-size:10px; font-weight:800; color:var(--secondary); text-transform:uppercase; margin-bottom:4px">Container</p>
-                            <div style="height:100px; background:var(--bg-main); display:flex; align-items:center; justify-content:center; border-radius:12px; font-size:1.5rem">🚢</div>
+                            <p class="small-label">Container</p>
+                            <div class="placeholder-box"><i data-lucide="container" style="width:30px; height:30px"></i></div>
                          </div>
                     </div>
                 </div>
 
-                <button class="btn btn-primary" style="margin-top:2rem" onclick="pdfControl.generateCertificat('${lot.id}')">📄 Télécharger Certificat PDF</button>
+                <button class="btn btn-primary" style="margin-top:2rem" onclick="pdfControl.generateCertificat('${lot.id}')">
+                    <i data-lucide="file-down"></i> Télécharger Certificat PDF
+                </button>
             </div>
         `;
-
+        app.refreshIcons();
         gps.initMap('map-verify', lot.gps.lat, lot.gps.lng);
     },
 

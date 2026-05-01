@@ -22,6 +22,12 @@
     -webkit-tap-highlight-color: transparent;
 }
 
+button, .card, .nav-item, .user-badge, [onclick] {
+    cursor: pointer;
+}
+
+.hidden { display: none !important; }
+
 body {
     font-family: var(--font-body);
     background-color: var(--bg-main);
@@ -266,7 +272,131 @@ main {
     margin-left: 8px;
 }
 
-.hidden { display: none !important; }
+.user-badge {
+    background: var(--bg-main);
+    padding: 8px 16px;
+    border-radius: 100px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--primary);
+    border: 1px solid var(--gray);
+    cursor: pointer;
+}
+
+.user-badge i {
+    width: 14px;
+    height: 14px;
+}
+
+.btn-scan-main {
+    width: 100%;
+    background: var(--primary);
+    color: white;
+    border: none;
+    padding: 1.2rem;
+    border-radius: 100px;
+    font-weight: 800;
+    font-family: var(--font-heading);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 2rem;
+    box-shadow: 0 10px 20px rgba(61, 26, 10, 0.2);
+}
+
+.proc-step {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 1rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.proc-step i.pending { color: var(--gray); }
+.proc-step i.done { color: var(--success); }
+
+.section-title {
+    margin: 2rem 0 1rem;
+    font-family: var(--font-heading);
+    font-size: 1rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+
+.card-footer {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.75rem;
+    color: var(--secondary);
+    font-weight: 600;
+}
+
+.dot {
+    opacity: 0.4;
+}
+
+.placeholder-box {
+    height: 80px;
+    background: var(--bg-main);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--secondary);
+}
+
+.placeholder-box i {
+    width: 24px;
+    height: 24px;
+}
+
+.eudr-icon-box {
+    width: 48px;
+    height: 48px;
+    background: white;
+    border-radius: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--success);
+    margin-right: 12px;
+}
+
+.small-label {
+    font-size: 10px;
+    font-weight: 800;
+    color: var(--secondary);
+    text-transform: uppercase;
+    margin-bottom: 4px;
+}
+
+.timeline-meta {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 0.7rem;
+    color: var(--secondary);
+    font-weight: 600;
+}
+
+.timeline-meta i {
+    width: 10px;
+    height: 10px;
+}
 
 /* Nav */
 .app-nav {

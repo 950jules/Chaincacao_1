@@ -25,37 +25,43 @@ const exportateur = {
             </div>
 
             <div class="search-box" style="margin-bottom: 2rem">
-                <input type="text" id="export-search" placeholder="Rechercher un ID de sac..." oninput="exportateur.filterLots(this.value)">
-                <button onclick="exportateur.startScan()">📷 SCAN</button>
+                <input type="text" id="export-search" placeholder="Rechercher lot..." oninput="exportateur.filterLots(this.value)">
+                <button onclick="exportateur.startScan()">
+                    <i data-lucide="camera" style="width:16px; height:16px"></i>
+                    SCAN
+                </button>
             </div>
 
-            <h3 style="margin: 2rem 0 1rem; font-family:var(--font-heading); font-size: 1rem; font-weight: 800;">Lots prêts pour l'export</h3>
+            <h3 class="section-title">Lots prêts pour l'export</h3>
             <div id="export-lot-list" style="margin-bottom: 8rem">
                 ${validatedLots.map(lot => `
                     <div class="card arrival-card">
                         <input type="checkbox" class="arrival-check" data-id="${lot.id}" data-weight="${lot.weight}" onchange="exportateur.updateSummary()">
                         <div style="flex:1">
-                            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 4px">
-                                <strong style="font-family:var(--font-heading); font-weight:800; color:var(--primary)">${lot.id}</strong>
+                            <div class="card-header" style="margin-bottom:0">
+                                <strong class="lot-id">${lot.id}</strong>
                                 <span class="badge badge-success">${lot.weight}kg</span>
                             </div>
-                            <div style="font-size:0.75rem; color:var(--secondary); font-weight:600; display:flex; align-items:center; gap:8px">
-                                <span>${lot.species} • ${utils.formatDate(lot.timestamp)}</span>
-                                <span style="color:var(--success); font-weight:800; font-size:9px; border:1px solid var(--success); padding:2px 6px; border-radius:4px">EUDR ✓</span>
+                            <div class="card-footer" style="margin-top:4px">
+                                <span>${lot.species}</span>
+                                <span class="dot">•</span>
+                                <span style="color:var(--success); font-weight:800; font-size:9px">EUDR ✓</span>
                             </div>
                         </div>
                     </div>
                 `).join('')}
-                ${validatedLots.length === 0 ? '<div style="text-align:center; padding:3rem; color:var(--secondary)">Aucun lot en attente</div>' : ''}
+                ${validatedLots.length === 0 ? '<div class="empty-state">Aucun lot en attente</div>' : ''}
             </div>
             <div id="selection-summary" class="selection-summary hidden">
-                <div>
-                    <div id="sel-count">0 LOTS SÉLECTIONNÉS</div>
-                    <div id="sel-weight">0.0 KG</div>
+                <div class="summary-info">
+                    <span id="sel-count">0 LOTS</span>
+                    <span class="dot">•</span>
+                    <span id="sel-weight">0.0 KG</span>
                 </div>
-                <button class="btn btn-white" style="background:white; color:var(--primary); font-family:var(--font-heading); font-weight:800; padding: 0.8rem 1.2rem; font-size: 0.75rem" onclick="exportateur.createManifest()">CRÉER MANIFESTE</button>
+                <button class="btn btn-white" onclick="exportateur.createManifest()">TRAITEMENT EXPORT</button>
             </div>
         `;
+        app.refreshIcons();
     },
 
     updateSummary() {
@@ -100,31 +106,72 @@ const exportateur = {
         const checks = document.querySelectorAll('.arrival-check:checked');
         const ids = Array.from(checks).map(c => c.getAttribute('data-id'));
         
-        if (confirm(`Générer un manifeste d'exportation pour ces ${ids.length} lots ?`)) {
-            const containerId = prompt("Entrez le numéro du container (Ex: MEDU-1234567) :") || "CONT-" + Math.random().toString(36).substring(2, 8).toUpperCase();
+        if (confirm(`Traiter l'export pour ${ids.length} sacs ?`)) {
+            const containerId = prompt("Numéro de Container (ex: MSCU-123456) :") || "CONT-" + Math.random().toString(36).substring(2, 8).toUpperCase();
             
+            app.showModal(`
+                <div style="text-align:center; padding:1rem">
+                    <h3 style="color:var(--primary); margin-bottom:1.5rem">PROCÉDURE D'EXPORTATION</h3>
+                    <div id="export-steps-list" style="text-align:left; max-width:300px; margin:0 auto">
+                        <div class="proc-step" id="proc-1"><i data-lucide="check-circle" class="pending"></i> Contrôle Phytosanitaire (Lomé)</div>
+                        <div class="proc-step" id="proc-2"><i data-lucide="circle" class="pending"></i> Scellage Container ${containerId}</div>
+                        <div class="proc-step" id="proc-3"><i data-lucide="circle" class="pending"></i> Validation Douanes Togolaises</div>
+                        <div class="proc-step" id="proc-4"><i data-lucide="circle" class="pending"></i> Chargement Port Autonome de Lomé</div>
+                    </div>
+                    <div id="proc-status" style="margin-top:2rem; font-weight:700; color:var(--secondary)">Initialisation...</div>
+                </div>
+            `);
+            app.refreshIcons();
+
+            await new Promise(r => setTimeout(r, 1000));
+            document.getElementById('proc-1').querySelector('i').className = 'done';
+            document.getElementById('proc-status').innerText = "Contrôle Qualité OK";
+            
+            await new Promise(r => setTimeout(r, 1000));
+            document.getElementById('proc-2').querySelector('i').setAttribute('data-lucide', 'check-circle');
+            document.getElementById('proc-2').querySelector('i').className = 'done';
+            document.getElementById('proc-status').innerText = "Scellage en cours...";
+            app.refreshIcons();
+
+            await new Promise(r => setTimeout(r, 1000));
+            document.getElementById('proc-3').querySelector('i').setAttribute('data-lucide', 'check-circle');
+            document.getElementById('proc-3').querySelector('i').className = 'done';
+            document.getElementById('proc-status').innerText = "Douanes validées";
+            app.refreshIcons();
+
             for (const id of ids) {
                 const lot = await database.getLot(id);
                 lot.status = 'EXPORTED';
                 lot.containerId = containerId;
                 await database.updateLot(lot);
                 
-                const tx = await blockchain.simulateTransaction({ action: 'EXPORT_READY', lots: ids, containerId }, 'EXP-001');
+                const tx = await blockchain.simulateTransaction({ action: 'EXPORT_COMPLETE', containerId }, 'EXP-001');
                 await database.addTransfer({
                     lotId: id,
                     actorId: 'EXP-001',
-                    type: 'EXPORT_SHIPPED',
+                    type: 'EXPORT_COMPLETED',
                     timestamp: new Date(),
                     hash: tx.hash,
                     data: { 
                         containerId: containerId,
-                        compliance: 'EUDR_VERIFIED_DEFORESTATION_FREE',
-                        destination: 'Rotterdam, NL' 
+                        port: 'Lomé, Togo',
+                        compliance: 'EUDR_CERTIFIED_TOGO_CACAO',
+                        customsRef: 'TG-LFW-2026-' + Math.floor(Math.random()*100000)
                     }
                 });
             }
-            alert(`Succès !\nContainer: ${containerId}\nLes certificats EUDR ont été générés pour ${ids.length} lots.`);
-            this.renderDashboard();
+
+            await new Promise(r => setTimeout(r, 1000));
+            document.getElementById('proc-4').querySelector('i').setAttribute('data-lucide', 'check-circle');
+            document.getElementById('proc-4').querySelector('i').className = 'done';
+            document.getElementById('proc-status').innerText = "PRÊT POUR EMBARQUEMENT";
+            app.refreshIcons();
+
+            setTimeout(() => {
+                alert(`Exportation validée !\nLes lots ont été scellés dans le container ${containerId} et enregistrés sur la blockchain Polygon.`);
+                document.querySelector('.close-modal').click();
+                this.renderDashboard();
+            }, 1000);
         }
     }
 };

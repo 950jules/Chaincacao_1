@@ -78,10 +78,12 @@
     <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js" defer></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" defer></script>
+    <script src="https://unpkg.com/lucide@latest" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/motion/dist/motion.js" defer></script>
 
     <!-- Styles -->
     <link rel="stylesheet" href="./css/style.css">
+    <link rel="stylesheet" href="./css/auth.css">
     <link rel="stylesheet" href="./css/gps.css">
     <link rel="stylesheet" href="./css/agriculteur.css">
     <link rel="stylesheet" href="./css/cooperative.css">
@@ -103,7 +105,11 @@
                     <div class="logo-tagline">Traçabilité Blockchain Temps Réel</div>
                 </div>
             </div>
-            <div id="connection-status" class="status-badge online">Mode Hors-Ligne Prêt</div>
+            <div id="user-info" class="user-badge" onclick="auth.logout()">
+                <i data-lucide="user"></i>
+                <span id="user-id-display">Invité</span>
+                <button id="install-btn">📱 INSTALLER</button>
+            </div>
         </header>
 
         <!-- Main Content (Containers) -->
@@ -134,8 +140,10 @@
             <section id="screen-verificateur" class="screen hidden">
                 <span class="section-label">04. Vérificateur</span>
                 <div class="search-box">
-                    <input type="text" id="verify-input" placeholder="Scanner ou saisir ID Lot...">
-                    <button id="btn-verify">Vérifier</button>
+                    <input type="text" id="verify-input" placeholder="ID Lot...">
+                    <button id="btn-verify">
+                        <i data-lucide="search" style="width:18px; height:18px"></i>
+                    </button>
                 </div>
                 <div id="verifier-result" class="hidden"></div>
             </section>
@@ -144,19 +152,19 @@
         <!-- Navigation -->
         <nav class="app-nav">
             <button class="nav-item active" data-screen="agriculteur">
-                <span class="icon">🚜</span>
+                <span class="icon"><i data-lucide="tractor"></i></span>
                 <span class="label">Récolte</span>
             </button>
             <button class="nav-item" data-screen="cooperative">
-                <span class="icon">🏭</span>
+                <span class="icon"><i data-lucide="factory"></i></span>
                 <span class="label">Collecte</span>
             </button>
             <button class="nav-item" data-screen="exportateur">
-                <span class="icon">🚛</span>
+                <span class="icon"><i data-lucide="truck"></i></span>
                 <span class="label">Export</span>
             </button>
             <button class="nav-item" data-screen="verificateur">
-                <span class="icon">🔍</span>
+                <span class="icon"><i data-lucide="shield-check"></i></span>
                 <span class="label">VÉRIFICATEUR</span>
             </button>
         </nav>
@@ -176,6 +184,7 @@
     <!-- Scripts -->
     <script src="./js/utils.js" defer></script>
     <script src="./js/database.js" defer></script>
+    <script src="./js/auth.js" defer></script>
     <script src="./js/blockchain.js" defer></script>
     <script src="./js/gps.js" defer></script>
     <script src="./js/camera.js" defer></script>

@@ -25,7 +25,7 @@ const utils = {
 
     isValidWeight: (weight) => !isNaN(weight) && weight > 0,
 
-    REGIONS: ["Sud-Ouest", "Est", "Centre", "Littoral"],
+    REGIONS: ["Agou", "Kpalimé", "Litimé", "Kpévé", "Atakpamé", "Badou", "Amlamé"],
     SPECIES: ["Forastero", "Criollo", "Trinitario"],
     QUALITY_GRADES: ["Grade 1", "Grade 2", "Standard"],
     EUDR_CUTOFF_DATE: new Date("2020-12-31")

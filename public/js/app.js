@@ -4,22 +4,36 @@ const app = {
             console.log("ChainCacao starting...");
             await database.init();
             offline.init();
-            verificateur.init();
-
-            this.setupNavigation();
+            auth.init();
             
-            // Render initial screen
-            agriculteur.renderDashboard();
+            this.setupNavigation();
+            this.setupPWAInstall();
+            this.refreshIcons();
         } catch (error) {
-            console.error("Initialization Failed:", error);
-            document.body.innerHTML = `
-                <div style="padding: 2rem; color: red; background: #fff; font-family: sans-serif;">
-                    <h1>Erreur d'initialisation</h1>
-                    <p>${error.message}</p>
-                    <pre>${error.stack}</pre>
-                    <button onclick="location.reload()" style="padding: 1rem; border: 1px solid #ccc; border-radius: 8px; cursor: pointer;">Réessayer</button>
-                </div>
-            `;
+            console.error("App init error:", error);
+        }
+    },
+
+    initUserSession(user) {
+        document.getElementById('user-id-display').innerText = user.id;
+        
+        // Hide/Show navigation items based on role if needed
+        // For now we allow all for demo purposes as requested
+        
+        if (user.role === 'AGR') this.switchScreen('agriculteur');
+        else if (user.role === 'COOP') this.switchScreen('cooperative');
+        else if (user.role === 'EXP') this.switchScreen('exportateur');
+        else if (user.role === 'VER') this.switchScreen('verificateur');
+    },
+
+    switchScreen(id) {
+        const navItem = document.querySelector(`.nav-item[data-screen="${id}"]`);
+        if (navItem) navItem.click();
+    },
+
+    refreshIcons() {
+        if (window.lucide) {
+            window.lucide.createIcons();
         }
     },
 
@@ -43,6 +57,28 @@ const app = {
                 this.renderScreen(screenId);
             };
         });
+    },
+
+    setupPWAInstall() {
+        let deferredPrompt;
+        const installBtn = document.getElementById('install-btn');
+
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            installBtn.style.display = 'block';
+        });
+
+        installBtn.onclick = async (e) => {
+            e.stopPropagation();
+            if (!deferredPrompt) return;
+            deferredPrompt.prompt();
+            const { outcome } = await deferredPrompt.userChoice;
+            if (outcome === 'accepted') {
+                installBtn.style.display = 'none';
+            }
+            deferredPrompt = null;
+        };
     },
 
     renderScreen(id) {

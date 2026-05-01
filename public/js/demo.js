@@ -131,73 +131,82 @@ const demo = {
         app.switchScreen('agriculteur');
         await this.wait(1000);
         
-        // Ouvrir modal
+        // Ouvrir formulaire
         this.highlight('#btn-new-lot');
-        agriculteur.openModal();
+        agriculteur.showForm();
+        await this.wait(1000);
+
+        // Étape 1: Saisie
+        document.getElementById('f-weight').value = 75;
+        document.getElementById('f-bags').value = 3;
+        document.getElementById('f-region').value = "Kpalimé";
+        this.highlight('#f-weight');
         await this.wait(800);
+        agriculteur.nextStep(2);
+        await this.wait(1000);
 
-        // Remplir
-        document.getElementById('lot-weight').value = 75;
-        document.getElementById('lot-bags').value = 3;
-        document.getElementById('lot-region').value = "Kpévé";
-        this.highlight('#lot-weight');
-        await this.wait(500);
-
-        // Simulation GPS
+        // Étape 2: GPS
         agriculteur.formState.data.gps = { lat: 6.9075, lng: 0.6339 };
-        document.getElementById('gps-status').innerHTML = "📍 GPS: 6.9075, 0.6339 (OK)";
-        await this.wait(500);
+        document.getElementById('f-gps-display').innerHTML = "📍 GPS: 6.9075, 0.6339 (Fixé)";
+        this.highlight('#btn-gps-capture');
+        await this.wait(1000);
 
-        // Valider
-        this.highlight('#btn-save-lot');
-        await agriculteur.saveLot();
+        agriculteur.nextStep(3);
         await this.wait(1500);
     },
 
     async stepCoop() {
-        document.querySelector('.demo-msg').innerText = "Étape 2: Validation par la coopérative";
+        document.querySelector('.demo-msg').innerText = "Étape 2: Validation coopérative & scellage blockchain";
         app.switchScreen('cooperative');
         await this.wait(1000);
 
         const lots = await database.getAllLots();
-        const demoLot = lots[lots.length - 1]; // Le dernier créé
+        const demoLot = lots[lots.length - 1];
 
         // Ouvrir validation
-        cooperative.openValidation(demoLot.id);
-        await this.wait(800);
+        cooperative.loadLotDetails(demoLot.id);
+        await this.wait(1000);
 
         // Saisir poids réel
         document.getElementById('official-weight').value = 74.2;
         this.highlight('#official-weight');
-        cooperative.checkWeight(); // Trigger calcul écart
         await this.wait(1000);
 
         // Sceller
-        this.highlight('#btn-confirm-coop');
+        this.highlight('.btn-primary');
         await cooperative.validateLot(demoLot.id);
         await this.wait(1500);
     },
 
     async stepExport() {
-        document.querySelector('.demo-msg').innerText = "Étape 3: Préparation de l'exportation (EUDR)";
+        document.querySelector('.demo-msg').innerText = "Étape 3: Procédure export & Douanes Togolaises";
         app.switchScreen('exportateur');
         await this.wait(1000);
 
         // Sélectionner
-        const check = document.querySelector('input[type="checkbox"]');
-        if (check) check.checked = true;
-        this.highlight('.lot-card');
+        const check = document.querySelector('.arrival-check');
+        if (check) {
+            check.checked = true;
+            exportateur.updateSummary();
+        }
+        this.highlight('.arrival-card');
         await this.wait(800);
 
-        // Générer Manifeste
-        this.highlight('#btn-export-manifest');
-        // Override prompt for demo
-        const originalPrompt = window.prompt;
-        window.prompt = () => "MSCU-DEMO-001";
-        await exportateur.generateManifest();
-        window.prompt = originalPrompt;
+        // Traiter Export
+        this.highlight('.btn-white');
         
-        await this.wait(1500);
+        // Override confirm/prompt
+        const oldConfirm = window.confirm;
+        const oldPrompt = window.prompt;
+        window.confirm = () => true;
+        window.prompt = () => "MEDU-TG-001";
+        
+        await exportateur.createManifest();
+        
+        window.confirm = oldConfirm;
+        window.prompt = oldPrompt;
+        
+        await this.wait(5000); // Temps pour voir la procédure Douanes
     },
 
     async stepVerify() {

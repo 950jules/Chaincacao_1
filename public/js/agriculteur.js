@@ -7,29 +7,41 @@ const agriculteur = {
         container.innerHTML = `
             <div class="stats-grid">
                 <div class="stat-item">
-                    <span class="l">Total Semaine</span>
+                    <span class="l">TOTAL SEMAINE</span>
                     <span class="v">${totalWeight.toFixed(1)}kg</span>
                 </div>
                 <div class="stat-item">
-                    <span class="l">Lots Actifs</span>
+                    <span class="l">LOTS ACTIFS</span>
                     <span class="v">${lots.length}</span>
                 </div>
             </div>
-            <button class="btn btn-primary" id="btn-new-lot">🚜 NOUVEAU LOT</button>
-            <h3 style="margin: 2rem 0 1rem; font-family:var(--font-heading); font-size: 1rem; font-weight: 800;">Historique des récoltes</h3>
+            <button class="btn btn-primary" id="btn-new-lot">
+                <i data-lucide="plus-circle" style="width:18px; height:18px"></i>
+                NOUVEAU LOT
+            </button>
+            <h3 class="section-title">Historique des récoltes</h3>
             <div id="agri-lot-list">
                 ${lots.reverse().map(lot => `
-                    <div class="card" onclick="agriculteur.showDetails('${lot.id}')" style="cursor:pointer">
-                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 0.5rem">
-                            <strong style="font-family:var(--font-heading); font-weight:800; color:var(--primary)">${lot.id}</strong>
-                            <span class="badge ${lot.status === 'CREATED' ? 'badge-warning' : 'badge-success'}">${lot.status === 'CREATED' ? 'Nouveau' : 'Validé'}</span>
+                    <div class="card" onclick="agriculteur.showDetails('${lot.id}')">
+                        <div class="card-header">
+                            <strong class="lot-id">${lot.id}</strong>
+                            <span class="badge ${lot.status === 'CREATED' ? 'badge-warning' : 'badge-success'}">
+                                ${lot.status === 'CREATED' ? 'Nouveau' : 'Validé'}
+                            </span>
                         </div>
-                        <div style="font-size:0.8rem; color:var(--secondary); font-weight: 600;">${utils.formatDate(lot.timestamp)} - ${lot.weight}kg</div>
+                        <div class="card-footer">
+                            <i data-lucide="calendar" style="width:12px; height:12px"></i>
+                            <span>${utils.formatDate(lot.timestamp)}</span>
+                            <span class="dot">•</span>
+                            <i data-lucide="weight" style="width:12px; height:12px"></i>
+                            <span>${lot.weight}kg</span>
+                        </div>
                     </div>
                 `).join('')}
             </div>
         `;
 
+        app.refreshIcons();
         document.getElementById('btn-new-lot').onclick = () => this.showForm();
     },
 
@@ -72,16 +84,20 @@ const agriculteur = {
             `;
         } else if (step === 2) {
             content = `
-                <h3>Étape 2: Preuves terrain</h3>
+                <h3 class="step-title">Étape 2: Preuves terrain</h3>
                 <div class="photo-preview" id="f-photo-preview">
-                    ${this.formState.data.photo ? `<img src="${this.formState.data.photo}">` : '<span>Pas de photo</span>'}
+                    ${this.formState.data.photo ? `<img src="${this.formState.data.photo}">` : '<span><i data-lucide="image"></i> Pas de photo</span>'}
                 </div>
-                <button class="btn btn-outline" style="background:rgba(212,163,115,0.1); border:1px solid var(--primary); color:var(--primary)" onclick="agriculteur.takePhoto()">📸 PRENDRE PHOTO SAC</button>
+                <button class="btn btn-outline" style="background:rgba(212,163,115,0.1); border:1px solid var(--primary); color:var(--primary)" onclick="agriculteur.takePhoto()">
+                    <i data-lucide="camera"></i> PHOTO DU SAC
+                </button>
                 
                 <div id="mini-map" class="mini-map-container" style="display:none"></div>
                 <div id="f-gps-display" style="margin-top:0.5rem"></div>
 
-                <button class="btn btn-primary" id="btn-gps-capture" onclick="agriculteur.getGps()">📍 CAPTURER POSITION GPS</button>
+                <button class="btn btn-primary" id="btn-gps-capture" onclick="agriculteur.getGps()">
+                    <i data-lucide="map-pin"></i> CAPTURER GPS
+                </button>
                 
                 <div class="action-bar">
                     <button class="btn btn-outline" onclick="agriculteur.renderFormStep(1)">Retour</button>

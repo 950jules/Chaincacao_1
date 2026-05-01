@@ -6,37 +6,45 @@ const cooperative = {
 
         container.innerHTML = `
             <div class="search-box">
-                <input type="text" id="coop-search" placeholder="Rechercher ID ou scanner..." oninput="cooperative.filterLots(this.value)">
-                <button onclick="cooperative.startScan()">📷 SCAN</button>
+                <input type="text" id="coop-search" placeholder="ID ou scanner lot..." oninput="cooperative.filterLots(this.value)">
+                <button onclick="cooperative.startScan()">
+                    <i data-lucide="camera" style="width:16px; height:16px"></i>
+                    SCAN
+                </button>
             </div>
             
             <div class="stats-grid">
                 <div class="stat-item">
-                    <span class="l">Lots en attente</span>
+                    <span class="l">En attente</span>
                     <span class="v">${pendingLots.length}</span>
                 </div>
                 <div class="stat-item">
-                    <span class="l">Total Collecté</span>
+                    <span class="l">TOTAL COLLECTÉ</span>
                     <span class="v">${allLots.length}</span>
                 </div>
             </div>
 
-            <h3 style="margin-bottom: 1rem">Lots à valider</h3>
+            <h3 class="section-title">Lots à valider</h3>
             <div id="coop-lot-list">
                 ${pendingLots.map(lot => `
-                    <div class="card" onclick="cooperative.loadLotDetails('${lot.id}')" style="cursor:pointer">
-                        <div style="display:flex; justify-content:space-between; align-items:center">
-                            <strong style="font-family:var(--font-heading); font-weight:800; color:var(--primary)">${lot.id}</strong>
+                    <div class="card" onclick="cooperative.loadLotDetails('${lot.id}')">
+                        <div class="card-header">
+                            <strong class="lot-id">${lot.id}</strong>
                             <span class="badge ${lot.weight > 50 ? 'badge-success' : 'badge-warning'}">${lot.weight}kg</span>
                         </div>
-                        <div style="font-size:0.8rem; color:var(--secondary); font-weight:600; margin-top:0.25rem">
-                            ${lot.farmerName} • ${utils.formatDate(lot.timestamp)}
+                        <div class="card-footer">
+                            <i data-lucide="user" style="width:12px; height:12px"></i>
+                            <span>${lot.farmerName}</span>
+                            <span class="dot">•</span>
+                            <i data-lucide="clock" style="width:12px; height:12px"></i>
+                            <span>${utils.formatDate(lot.timestamp)}</span>
                         </div>
                     </div>
                 `).join('')}
-                ${pendingLots.length === 0 ? '<p style="text-align:center; padding:3rem; color:var(--secondary)">Aucun lot en attente</p>' : ''}
+                ${pendingLots.length === 0 ? '<div class="empty-state">Tout est validé !</div>' : ''}
             </div>
         `;
+        app.refreshIcons();
         
         this.renderHistory();
     },
@@ -99,7 +107,7 @@ const cooperative = {
                         <label>Paiement effectué</label>
                         <select id="payment-status">
                             <option value="pending">En attente</option>
-                            <option value="paid">✅ PAYÉ</option>
+                            <option value="paid">PAYÉ</option>
                         </select>
                     </div>
                 </div>
