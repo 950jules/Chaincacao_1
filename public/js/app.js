@@ -15,10 +15,33 @@ const app = {
     },
 
     initUserSession(user) {
-        document.getElementById('user-id-display').innerText = user.id;
+        const display = document.getElementById('user-id-display');
+        if (display) {
+            const name = user.firstname && user.lastname ? `${user.firstname} ${user.lastname}` : (user.name || user.id);
+            display.innerHTML = `<div style="display:flex; flex-direction:column; align-items:flex-end">
+                <span style="font-weight:900; font-size:11px; white-space:nowrap">${name}</span>
+                <span style="font-size:9px; opacity:0.7; font-weight:600">${user.id}</span>
+            </div>`;
+        }
         
-        // Hide/Show navigation items based on role if needed
-        // For now we allow all for demo purposes as requested
+        // Isolation des fonctionnalités par rôle
+        const navItems = document.querySelectorAll('.nav-item');
+        navItems.forEach(item => {
+            const screenId = item.getAttribute('data-screen');
+            let isAllowed = false;
+
+            if (user.role === 'AGR' && screenId === 'agriculteur') isAllowed = true;
+            else if (user.role === 'COOP' && screenId === 'cooperative') isAllowed = true;
+            else if (user.role === 'EXP' && screenId === 'exportateur') isAllowed = true;
+            else if (user.role === 'VER' && screenId === 'verificateur') isAllowed = true;
+
+            // Masquer les onglets non autorisés
+            if (isAllowed) {
+                item.style.display = 'flex';
+            } else {
+                item.style.display = 'none';
+            }
+        });
         
         if (user.role === 'AGR') this.switchScreen('agriculteur');
         else if (user.role === 'COOP') this.switchScreen('cooperative');
@@ -44,6 +67,20 @@ const app = {
         navItems.forEach(item => {
             item.onclick = () => {
                 const screenId = item.getAttribute('data-screen');
+                const user = JSON.parse(localStorage.getItem('chaincacao_user'));
+                
+                // Vérification de sécurité supplémentaire
+                let isAllowed = false;
+                if (!user) return;
+                if (user.role === 'AGR' && screenId === 'agriculteur') isAllowed = true;
+                else if (user.role === 'COOP' && screenId === 'cooperative') isAllowed = true;
+                else if (user.role === 'EXP' && screenId === 'exportateur') isAllowed = true;
+                else if (user.role === 'VER' && screenId === 'verificateur') isAllowed = true;
+
+                if (!isAllowed) {
+                    console.warn("Accès refusé à cet écran pour votre rôle.");
+                    return;
+                }
                 
                 // Update Nav
                 navItems.forEach(i => i.classList.remove('active'));

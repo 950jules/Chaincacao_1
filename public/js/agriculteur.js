@@ -1,18 +1,44 @@
 const agriculteur = {
     async renderDashboard() {
+        const user = JSON.parse(localStorage.getItem('chaincacao_user')) || { firstname: 'Agriculteur' };
         const lots = await database.getAllLots();
         const totalWeight = lots.reduce((acc, lot) => acc + lot.weight, 0);
         
         const container = document.getElementById('agriculteur-dashboard');
         container.innerHTML = `
+            <div class="welcome-header">
+                <div>
+                    <small>Bienvenue au dépôt,</small>
+                    <h2>Bonjour ${user.firstname}! 👋</h2>
+                </div>
+                <div class="location-badge">
+                    <i data-lucide="map-pin"></i>
+                </div>
+            </div>
+            
+            <div class="status-horizontal-band">
+                <div class="status-mini yellow">
+                    <span class="val">${lots.filter(l => l.status === 'CREATED').length}</span>
+                    <span class="lbl">EN ATTENTE</span>
+                </div>
+                <div class="status-mini green">
+                    <span class="val">${lots.filter(l => l.status === 'COLLECTED' || l.status === 'EXPORTED').length}</span>
+                    <span class="lbl">ACCEPTÉS</span>
+                </div>
+                <div class="status-mini red">
+                    <span class="val">0</span>
+                    <span class="lbl">REFUSÉS</span>
+                </div>
+            </div>
+
             <div class="stats-grid">
                 <div class="stat-item">
                     <span class="l">TOTAL SEMAINE</span>
                     <span class="v">${totalWeight.toFixed(1)}kg</span>
                 </div>
                 <div class="stat-item">
-                    <span class="l">LOTS ACTIFS</span>
-                    <span class="v">${lots.length}</span>
+                    <span class="l">DERNIÈRE PESÉE</span>
+                    <span class="v">${lots.length > 0 ? lots[lots.length - 1].weight : 0}kg</span>
                 </div>
             </div>
             <button class="btn btn-primary" id="btn-new-lot">
@@ -172,12 +198,13 @@ const agriculteur = {
     },
 
     async saveLot() {
+        const user = JSON.parse(localStorage.getItem('chaincacao_user')) || { id: 'UNK', firstname: 'Inconnu' };
         const id = utils.generateId(this.formState.data.region);
         const now = new Date();
         const lot = {
             id: id,
-            farmerId: 'ACT-001',
-            farmerName: 'Jean Coulibaly',
+            farmerId: user.id,
+            farmerName: `${user.firstname} ${user.lastname}`,
             timestamp: now,
             weight: this.formState.data.weight,
             species: this.formState.data.species,
@@ -188,10 +215,10 @@ const agriculteur = {
         };
         await database.addLot(lot);
         
-        const tx = await blockchain.simulateTransaction(lot, 'ACT-001');
+        const tx = await blockchain.simulateTransaction(lot, user.id);
         await database.addTransfer({
             lotId: id,
-            actorId: 'ACT-001',
+            actorId: user.id,
             type: 'CREATION',
             timestamp: now,
             hash: tx.hash,

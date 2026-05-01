@@ -1,13 +1,68 @@
+.welcome-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.welcome-header h2 {
+    font-size: 1.5rem;
+    font-weight: 900;
+    color: var(--primary);
+    margin: 0;
+    letter-spacing: -0.03em;
+}
+
+.welcome-header small {
+    color: var(--secondary);
+    font-weight: 600;
+}
+
+.location-badge {
+    width: 40px;
+    height: 40px;
+    background: #C4E4B5;
+    color: #2D5A1B;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.status-horizontal-band {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 20px;
+}
+
+.status-mini {
+    padding: 10px;
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid rgba(0,0,0,0.05);
+}
+
+.status-mini.yellow { background: #FFF9C4; color: #F57F17; }
+.status-mini.green { background: #C8E6C9; color: #2E7D32; }
+.status-mini.red { background: #FFCDD2; color: #C62828; }
+
+.status-mini .val { font-weight: 900; font-size: 1.1rem; }
+.status-mini .lbl { font-size: 7px; font-weight: 800; opacity: 0.8; }
+
 .stats-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 1.25rem;
-    margin-bottom: 2rem;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
 }
 
 .stat-item {
     background: var(--white);
-    padding: 1.5rem;
+    padding: 1.25rem;
     border-radius: var(--border-radius);
     text-align: left;
     box-shadow: var(--shadow);
@@ -16,12 +71,12 @@
 
 .stat-item .v {
     display: block;
-    font-size: 1.8rem;
+    font-size: 1.4rem;
     font-weight: 800;
     color: var(--primary);
     font-family: var(--font-heading);
     letter-spacing: -0.04em;
-    margin-top: 0.25rem;
+    margin-top: 0.15rem;
 }
 
 .stat-item .l {
@@ -37,15 +92,15 @@
 /* Form Styles */
 .form-step h3 {
     font-family: var(--font-heading);
-    font-size: 1.4rem;
+    font-size: 1.2rem;
     font-weight: 800;
-    margin-bottom: 1.5rem;
+    margin-bottom: 1rem;
     color: var(--primary);
     letter-spacing: -0.02em;
 }
 
 .input-group {
-    margin-bottom: 1.5rem;
+    margin-bottom: 1.25rem;
 }
 
 .input-group label {
@@ -61,11 +116,11 @@
 
 .input-group input, .input-group select, .input-group textarea {
     width: 100%;
-    padding: 1.1rem;
+    padding: 0.9rem;
     background: var(--white);
     border: 1.5px solid rgba(61, 26, 10, 0.1);
-    border-radius: 16px;
-    font-size: 1rem;
+    border-radius: 14px;
+    font-size: 0.95rem;
     font-weight: 600;
     color: var(--primary);
     font-family: var(--font-body);

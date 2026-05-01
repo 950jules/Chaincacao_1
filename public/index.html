@@ -106,9 +106,11 @@
                 </div>
             </div>
             <div id="user-info" class="user-badge" onclick="auth.logout()">
-                <i data-lucide="user"></i>
-                <span id="user-id-display">Invité</span>
-                <button id="install-btn">INSTALLER</button>
+                <div id="user-display-container">
+                    <span id="user-id-display">Invité</span>
+                </div>
+                <i data-lucide="log-out" style="width:16px; margin-left:8px"></i>
+                <button id="install-btn" style="display:none">PWA</button>
             </div>
         </header>
 

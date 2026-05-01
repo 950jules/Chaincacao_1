@@ -157,6 +157,7 @@ const cooperative = {
     },
 
     async validateLot(lotId) {
+        const user = JSON.parse(localStorage.getItem('chaincacao_user')) || { id: 'COOP-001' };
         const offWeight = parseFloat(document.getElementById('official-weight').value);
         const moisture = parseFloat(document.getElementById('moisture-test').value);
         const payment = document.getElementById('payment-status').value;
@@ -170,10 +171,10 @@ const cooperative = {
         lot.paymentStatus = payment;
         await database.updateLot(lot);
 
-        const tx = await blockchain.simulateTransaction({ offWeight, lotId, moisture, grade: this.selectedGrade }, 'COOP-001');
+        const tx = await blockchain.simulateTransaction({ offWeight, lotId, moisture, grade: this.selectedGrade }, user.id);
         await database.addTransfer({
             lotId: lotId,
-            actorId: 'COOP-001',
+            actorId: user.id,
             type: 'COOP_VALIDATION',
             timestamp: new Date(),
             hash: tx.hash,

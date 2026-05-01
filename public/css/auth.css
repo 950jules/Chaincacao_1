@@ -17,42 +17,43 @@
 .auth-card {
     background: #F5EFE6;
     width: 100%;
-    max-width: 400px;
-    padding: 2.5rem 2rem;
-    border-radius: 32px;
+    max-width: 420px;
+    padding: 1.25rem 1rem;
+    border-radius: 28px;
     box-shadow: 0 30px 60px rgba(0,0,0,0.3);
     border: 1px solid rgba(255,255,255,0.5);
-    margin: auto; /* This centers it if content is smaller than viewport, and allows scrolling if larger */
+    margin: 1rem auto; /* Allow scrolling from top and bottom */
 }
 
 .auth-header {
     text-align: center;
-    margin-bottom: 2rem;
+    margin-bottom: 1.25rem;
 }
 
 .auth-header .logo-box {
-    width: 60px;
-    height: 60px;
+    width: 48px;
+    height: 48px;
     background: var(--primary);
     color: white;
-    font-size: 30px;
+    font-size: 24px;
     font-weight: 800;
-    margin: 0 auto 1rem;
+    margin: 0 auto 0.75rem;
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: 18px;
+    border-radius: 14px;
 }
 
 .auth-header h1 {
     font-family: var(--font-heading);
+    font-size: 1.25rem;
     font-weight: 800;
     color: var(--primary);
     margin: 0;
 }
 
 .auth-header p {
-    font-size: 0.8rem;
+    font-size: 0.75rem;
     color: var(--secondary);
     font-weight: 600;
 }
@@ -85,26 +86,26 @@
 }
 
 .auth-form .input-group {
-    margin-bottom: 1.25rem;
+    margin-bottom: 0.6rem;
 }
 
 .auth-form label {
     display: block;
-    font-size: 0.75rem;
+    font-size: 0.7rem;
     font-weight: 800;
     color: var(--secondary);
-    margin-bottom: 8px;
+    margin-bottom: 4px;
     text-transform: uppercase;
     letter-spacing: 0.5px;
 }
 
 .auth-form input, .auth-form select {
     width: 100%;
-    padding: 14px 16px;
-    border-radius: 14px;
+    padding: 10px 14px;
+    border-radius: 12px;
     border: 2px solid var(--gray);
     background: white;
-    font-size: 0.95rem;
+    font-size: 0.85rem;
     font-family: inherit;
     transition: all 0.2s;
 }

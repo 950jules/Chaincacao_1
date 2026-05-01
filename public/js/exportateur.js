@@ -140,15 +140,16 @@ const exportateur = {
             app.refreshIcons();
 
             for (const id of ids) {
+                const user = JSON.parse(localStorage.getItem('chaincacao_user')) || { id: 'EXP-001' };
                 const lot = await database.getLot(id);
                 lot.status = 'EXPORTED';
                 lot.containerId = containerId;
                 await database.updateLot(lot);
                 
-                const tx = await blockchain.simulateTransaction({ action: 'EXPORT_COMPLETE', containerId }, 'EXP-001');
+                const tx = await blockchain.simulateTransaction({ action: 'EXPORT_COMPLETE', containerId }, user.id);
                 await database.addTransfer({
                     lotId: id,
-                    actorId: 'EXP-001',
+                    actorId: user.id,
                     type: 'EXPORT_COMPLETED',
                     timestamp: new Date(),
                     hash: tx.hash,
