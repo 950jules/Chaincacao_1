@@ -86,9 +86,9 @@ const qrcodeScanner = {
    * Supporte : "CC-2026-XXXXXX" ou "https://.../CC-2026-XXXXXX"
    */
   _extractLotId(text) {
-    const match = text.match(/CC-\d{4}-[A-Z0-9]+/i);
-    return match ? match[0].toUpperCase() : null;
-  },
+  // Accepte tous les formats : CC-2026-XXX, (Region)-CC_XXX, etc.
+  return text.trim() || null;
+},
 
   /**
    * Génère un QR code dans un élément DOM
