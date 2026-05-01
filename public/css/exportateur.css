@@ -21,7 +21,7 @@
     font-weight: 800;
     text-transform: uppercase;
     color: var(--secondary);
-    border: 1.5px solid rgba(192, 103, 34, 0.1);
+    border: 1.5px solid rgba(93, 46, 23, 0.1);
     font-family: var(--font-heading);
     letter-spacing: 0.05em;
     box-shadow: var(--shadow);
@@ -61,7 +61,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    box-shadow: 0 20px 40px rgba(192, 103, 34, 0.4);
+    box-shadow: 0 20px 40px rgba(93, 46, 23, 0.4);
     z-index: 95;
     font-family: var(--font-heading);
 }
