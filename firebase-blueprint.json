@@ -1,26 +1,31 @@
 {
   "entities": {
     "User": {
-      "title": "Utilisateur",
-      "description": "Utilisateurs du système (Agriculteurs, Coopératives, Exportateurs)",
+      "title": "User",
+      "description": "User profile and role information",
       "type": "object",
       "properties": {
         "id": { "type": "string" },
-        "firstname": { "type": "string" },
-        "lastname": { "type": "string" },
         "role": { "type": "string", "enum": ["AGR", "COOP", "EXP", "VER"] },
-        "email": { "type": "string", "format": "email" }
+        "lastname": { "type": "string" },
+        "firstname": { "type": "string" },
+        "locality": { "type": "string" },
+        "age": { "type": "string" },
+        "phone": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
       },
-      "required": ["id", "firstname", "lastname", "role"]
+      "required": ["id", "role", "lastname", "firstname", "phone"]
     },
     "Lot": {
-      "title": "Lot de Cacao",
-      "description": "Lot de cacao créé par un agriculteur",
+      "title": "Lot",
+      "description": "Cacao lot information",
       "type": "object",
       "properties": {
         "id": { "type": "string" },
+        "farmerId": { "type": "string" },
+        "farmerName": { "type": "string" },
+        "timestamp": { "type": "string", "format": "date-time" },
         "weight": { "type": "number" },
-        "bags": { "type": "number" },
         "species": { "type": "string" },
         "region": { "type": "string" },
         "gps": {
@@ -30,44 +35,42 @@
             "lng": { "type": "number" }
           }
         },
-        "farmerId": { "type": "string" },
-        "status": { "type": "string" },
-        "createdAt": { "type": "string", "format": "date-time" }
+        "photo": { "type": "string" },
+        "status": { "type": "string", "enum": ["CREATED", "COLLECTED", "EXPORTED"] },
+        "officialWeight": { "type": "number" },
+        "qualityGrade": { "type": "string" },
+        "coopId": { "type": "string" },
+        "exportManifestId": { "type": "string" }
       },
-      "required": ["id", "weight", "region", "gps", "farmerId", "status", "createdAt"]
+      "required": ["id", "farmerId", "timestamp", "weight", "status"]
     },
     "Transfer": {
-      "title": "Transfert / Etape Blockchain",
-      "description": "Evénement de transfert ou de validation dans la chaîne",
+      "title": "Transfer",
+      "description": "Blockchain transaction and transfer records",
       "type": "object",
       "properties": {
-        "id": { "type": "string" },
         "lotId": { "type": "string" },
         "actorId": { "type": "string" },
-        "fromActor": { "type": "string" },
-        "toActor": { "type": "string" },
-        "fromRole": { "type": "string" },
-        "toRole": { "type": "string" },
-        "status": { "type": "string" },
+        "type": { "type": "string" },
         "timestamp": { "type": "string", "format": "date-time" },
-        "txHash": { "type": "string" },
-        "officialWeight": { "type": "number" }
+        "hash": { "type": "string" },
+        "data": { "type": "object" }
       },
-      "required": ["id", "lotId", "actorId", "status", "timestamp", "txHash"]
+      "required": ["lotId", "actorId", "type", "timestamp", "hash"]
     }
   },
   "firestore": {
-    "/users/{userId}": {
+    "users/{userId}": {
       "schema": "User",
-      "description": "Profils utilisateurs"
+      "description": "User profiles"
     },
-    "/lots/{lotId}": {
+    "lots/{lotId}": {
       "schema": "Lot",
-      "description": "Données des lots de cacao"
+      "description": "Cacao lots"
     },
-    "/transfers/{transferId}": {
+    "lots/{lotId}/transfers/{transferId}": {
       "schema": "Transfer",
-      "description": "Historique des transferts blockchain"
+      "description": "Transfer history for a specific lot"
     }
   }
 }

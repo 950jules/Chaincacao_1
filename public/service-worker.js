@@ -20,6 +20,7 @@ const ASSETS = [
     './js/qrcode.js',
     './js/pdf.js',
     './js/offline.js',
+    './js/firebase-init.js',
     'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css',
     'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js',
     'https://cdn.jsdelivr.net/npm/idb@8/build/umd.js',

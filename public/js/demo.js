@@ -61,6 +61,17 @@ const demo = {
 
     async start() {
         if (this.currentStep > 0) return;
+        
+        // Mock user for demo
+        auth.currentUser = {
+            id: 'DEMO-USER',
+            role: 'AGR',
+            firstname: 'Demo',
+            lastname: 'User',
+            locality: 'Atakpamé'
+        };
+        app.initUserSession(auth.currentUser);
+
         this.currentStep = 1;
         document.getElementById('demo-float-btn').classList.add('hidden');
         document.getElementById('demo-control-bar').classList.remove('hidden');
@@ -157,6 +168,11 @@ const demo = {
 
     async stepCoop() {
         document.querySelector('.demo-msg').innerText = "Étape 2: Validation coopérative & scellage blockchain";
+        
+        // Mock COOP role
+        auth.currentUser.role = 'COOP';
+        app.initUserSession(auth.currentUser);
+
         app.switchScreen('cooperative');
         await this.wait(1000);
 
@@ -180,6 +196,11 @@ const demo = {
 
     async stepExport() {
         document.querySelector('.demo-msg').innerText = "Étape 3: Procédure export & Douanes Togolaises";
+        
+        // Mock EXP role
+        auth.currentUser.role = 'EXP';
+        app.initUserSession(auth.currentUser);
+
         app.switchScreen('exportateur');
         await this.wait(1000);
 
@@ -211,6 +232,11 @@ const demo = {
 
     async stepVerify() {
         document.querySelector('.demo-msg').innerText = "Étape 4: Vérification finale de la traçabilité";
+        
+        // Mock VER role
+        auth.currentUser.role = 'VER';
+        app.initUserSession(auth.currentUser);
+
         app.switchScreen('verificateur');
         await this.wait(1000);
 

@@ -2,15 +2,23 @@ const auth = {
     currentUser: null,
 
     async init() {
-        this.currentUser = JSON.parse(localStorage.getItem('chaincacao_user'));
-        if (this.currentUser) {
-            app.initUserSession(this.currentUser);
+        // Wait for Firebase SDK visibility if necessary, though database.js handles it
+        const savedUser = JSON.parse(localStorage.getItem('chaincacao_user'));
+        if (savedUser) {
+            const profile = await database.getUser(savedUser.id);
+            if (profile) {
+                this.handleSuccess(profile);
+            } else {
+                this.showAuthScreen();
+            }
         } else {
             this.showAuthScreen();
         }
     },
 
     showAuthScreen() {
+        if (document.getElementById('auth-screen')) return;
+        
         const appEl = document.getElementById('app');
         const authContainer = document.createElement('div');
         authContainer.id = 'auth-screen';
@@ -42,11 +50,11 @@ const auth = {
                 <div id="register-form" class="auth-form hidden">
                     <div class="input-group">
                         <label>Je suis un :</label>
-                        <select id="reg-role" onchange="auth.updatePrefix()">
+                        <select id="reg-role">
                             <option value="AGR">Agriculteur</option>
                             <option value="COOP">Coopérative</option>
                             <option value="EXP">Exportateur</option>
-                            <option value="VER">Vérificateur</option>
+                            <option value="VER">Vérificateur (Douane/EUDR)</option>
                         </select>
                     </div>
                     <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px">
@@ -60,33 +68,27 @@ const auth = {
                         </div>
                     </div>
                     <div class="input-group">
-                        <label>Localité (Togo)</label>
+                        <label>Localité</label>
                         <select id="reg-locality">
-                            <option value="Agou">Agou</option>
-                            <option value="Kpalimé">Kpalimé</option>
-                            <option value="Litimé">Litimé</option>
-                            <option value="Kpévé">Kpévé</option>
-                            <option value="Atakpamé">Atakpamé</option>
-                            <option value="Badou">Badou</option>
-                            <option value="Amlamé">Amlamé</option>
+                            ${utils.REGIONS.map(r => `<option value="${r}">${r}</option>`).join('')}
                         </select>
                     </div>
                     <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px">
                         <div class="input-group">
                             <label>Âge</label>
-                            <input type="number" id="reg-age" placeholder="Age">
+                            <input type="number" id="reg-age" placeholder="Ex: 35">
                         </div>
                         <div class="input-group">
-                            <label>Téléphone (Togo)</label>
+                            <label>Mobile (+228)</label>
                             <input type="tel" id="reg-phone" placeholder="90123456">
                         </div>
                     </div>
                     <div class="input-group">
-                        <label>Mot de passe (min 8 car.)</label>
+                        <label>Mot de passe (min 6 car.)</label>
                         <input type="password" id="reg-pass" placeholder="••••••••">
                     </div>
                     <div class="input-group">
-                        <label>Confirmer le mot de passe</label>
+                        <label>Confirmer</label>
                         <input type="password" id="reg-pass-confirm" placeholder="••••••••">
                     </div>
                     <button class="btn btn-primary" onclick="auth.register()" style="margin-top:10px">S'INSCRIRE</button>
@@ -105,59 +107,88 @@ const auth = {
     },
 
     async login() {
-        const id = document.getElementById('login-id').value;
+        const id = document.getElementById('login-id').value.toUpperCase().trim();
         const pass = document.getElementById('login-pass').value;
 
-        const users = await database.getUsers() || [];
-        const user = users.find(u => u.id === id && u.password === pass);
+        if (!id || !pass) return alert("Veuillez remplir tous les champs");
 
-        if (user) {
-            this.handleSuccess(user);
-        } else {
+        const { signInWithEmailAndPassword } = window.FirebaseSDK.auth;
+        const email = `${id.toLowerCase()}@chaincacao.tg`;
+
+        try {
+            await signInWithEmailAndPassword(window.firebaseAuth, email, pass);
+            const user = await database.getUser(id);
+            if (user) {
+                this.handleSuccess(user);
+            } else {
+                alert("Erreur: Profil introuvable mais authentification réussie.");
+            }
+        } catch (e) {
+            console.error("Login Error", e);
             alert("Identifiant ou mot de passe incorrect");
         }
     },
 
     async register() {
         const role = document.getElementById('reg-role').value;
-        const last = document.getElementById('reg-lastname').value;
-        const first = document.getElementById('reg-firstname').value;
-        const locality = document.getElementById('reg-locality').value;
+        const last = document.getElementById('reg-lastname').value.trim();
+        const first = document.getElementById('reg-firstname').value.trim();
+        const loc = document.getElementById('reg-locality').value;
         const age = document.getElementById('reg-age').value;
-        const phone = document.getElementById('reg-phone').value;
+        const phone = document.getElementById('reg-phone').value.trim();
         const pass = document.getElementById('reg-pass').value;
         const passConfirm = document.getElementById('reg-pass-confirm').value;
 
-        if (!phone || phone.length < 8) return alert("Numéro de téléphone invalide");
-        if (pass.length < 8) return alert("Le mot de passe doit faire au moins 8 caractères");
+        if (!last || !first || !phone) return alert("Veuillez remplir tous les champs obligatoires");
+        if (phone.length < 8) return alert("Numéro de téléphone invalide");
+        if (pass.length < 6) return alert("Le mot de passe doit faire au moins 6 caractères");
         if (pass !== passConfirm) return alert("Les mots de passe ne correspondent pas");
 
         const userId = `${role}-${phone}`;
-        const newUser = {
-            id: userId,
-            role,
-            lastname: last,
-            firstname: first,
-            locality,
-            age,
-            phone,
-            password: pass
-        };
+        const email = `${userId.toLowerCase()}@chaincacao.tg`;
 
-        await database.saveUser(newUser);
-        alert(`Inscription réussie ! Votre identifiant est : ${userId}`);
-        this.handleSuccess(newUser);
+        const { createUserWithEmailAndPassword } = window.FirebaseSDK.auth;
+
+        try {
+            // Créer l'utilisateur dans Firebase Auth
+            await createUserWithEmailAndPassword(window.firebaseAuth, email, pass);
+            
+            // Créer le profil dans Firestore
+            const newUser = {
+                id: userId,
+                role,
+                lastname: last,
+                firstname: first,
+                locality: loc,
+                age,
+                phone,
+                password: pass, // Gardé pour compatibilité demo
+                createdAt: new Date().toISOString()
+            };
+
+            await database.saveUser(newUser);
+            alert(`Inscription réussie ! Votre identifiant est : ${userId}`);
+            this.handleSuccess(newUser);
+        } catch (e) {
+            console.error("Register Error", e);
+            alert("Erreur lors de l'inscription : " + e.message);
+        }
     },
 
     handleSuccess(user) {
         this.currentUser = user;
         localStorage.setItem('chaincacao_user', JSON.stringify(user));
-        document.getElementById('auth-screen').remove();
+        const screen = document.getElementById('auth-screen');
+        if (screen) screen.remove();
         document.getElementById('app').classList.remove('blurred');
+        
+        const display = document.getElementById('user-id-display');
+        if (display) display.innerText = `${user.firstname} (${user.id})`;
+        
         app.initUserSession(user);
     },
 
-    logout() {
+    async logout() {
         localStorage.removeItem('chaincacao_user');
         location.reload();
     }

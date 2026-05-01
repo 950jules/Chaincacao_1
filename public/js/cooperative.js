@@ -171,7 +171,7 @@ const cooperative = {
     },
 
     async validateLot(lotId) {
-        const user = JSON.parse(localStorage.getItem('chaincacao_user')) || { id: 'COOP-001' };
+        const user = auth.currentUser || { id: 'COOP-001' };
         const offWeightInput = document.getElementById('official-weight');
         const offWeight = parseFloat(offWeightInput.value);
         const moisture = parseFloat(document.getElementById('moisture-test').value);
@@ -222,22 +222,22 @@ const cooperative = {
     },
 
     async renderHistory() {
-        const user = JSON.parse(localStorage.getItem('chaincacao_user')) || { id: 'COOP-001' };
-        const transfers = await idb.openDB(DB_NAME, DB_VERSION).then(db => db.getAll('transfers'));
-        const coopTransfers = transfers.filter(t => t.actorId === user.id).reverse();
+        const user = auth.currentUser || { id: 'COOP-001' };
+        const allLots = await database.getAllLots();
+        const validatedLots = allLots.filter(l => (l.status === 'COOP_VALIDATED' || l.status === 'EXPORTED') && l.coopId === user.id).reverse();
         
         const container = document.getElementById('cooperative-history');
         container.innerHTML = `
             <h3>Collectes du jour</h3>
             <div class="history-list">
-                ${coopTransfers.map(t => `
+                ${validatedLots.map(l => `
                     <div class="history-item">
                         <div class="history-info">
-                            <div class="id">${t.lotId}</div>
-                            <div class="date">${utils.formatDate(t.timestamp)}</div>
+                            <div class="id">${l.id}</div>
+                            <div class="date">${utils.formatDate(l.timestamp)}</div>
                         </div>
                         <div style="display:flex; flex-direction:column; align-items:flex-end; gap:4px">
-                            <span class="badge badge-success">${t.data.grade}</span>
+                            <span class="badge badge-success">${l.quality?.grade || 'Grade 1'}</span>
                             <span style="font-size:9px; font-weight:800; color:var(--success); text-transform:uppercase">CERTIFIÉ EUDR</span>
                         </div>
                     </div>

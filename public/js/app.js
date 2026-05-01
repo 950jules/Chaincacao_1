@@ -54,7 +54,7 @@ const app = {
         const targetItem = document.querySelector(`.nav-item[data-screen="${id}"]`);
 
         // Check if allowed
-        const user = JSON.parse(localStorage.getItem('chaincacao_user'));
+        const user = auth.currentUser;
         if (user) {
             let isAllowed = false;
             if (user.role === 'AGR' && id === 'agriculteur') isAllowed = true;
@@ -91,7 +91,7 @@ const app = {
         navItems.forEach(item => {
             item.onclick = () => {
                 const screenId = item.getAttribute('data-screen');
-                const user = JSON.parse(localStorage.getItem('chaincacao_user'));
+                const user = auth.currentUser;
                 
                 // Vérification de sécurité supplémentaire
                 let isAllowed = false;

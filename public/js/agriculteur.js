@@ -1,6 +1,6 @@
 const agriculteur = {
     async renderDashboard() {
-        const user = JSON.parse(localStorage.getItem('chaincacao_user')) || { firstname: 'Agriculteur' };
+        const user = auth.currentUser || { firstname: 'Agriculteur' };
         const lots = await database.getAllLots();
         const totalWeight = lots.reduce((acc, lot) => acc + lot.weight, 0);
         
@@ -198,7 +198,7 @@ const agriculteur = {
     },
 
     async saveLot() {
-        const user = JSON.parse(localStorage.getItem('chaincacao_user')) || { id: 'UNK', firstname: 'Inconnu' };
+        const user = auth.currentUser || { id: 'UNK', firstname: 'Inconnu' };
         const id = utils.generateId(this.formState.data.region);
         const now = new Date();
         const lot = {

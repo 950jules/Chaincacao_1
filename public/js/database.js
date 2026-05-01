@@ -1,67 +1,141 @@
-const DB_NAME = 'ChainCacaoDB';
-const DB_VERSION = 2;
-
-let db;
-
 const database = {
     async init() {
-        db = await idb.openDB(DB_NAME, DB_VERSION, {
-            upgrade(db) {
-                if (!db.objectStoreNames.contains('lots')) {
-                    db.createObjectStore('lots', { keyPath: 'id' });
-                }
-                if (!db.objectStoreNames.contains('transfers')) {
-                    const store = db.createObjectStore('transfers', { keyPath: 'id', autoIncrement: true });
-                    store.createIndex('by-lot', 'lotId');
-                }
-                if (!db.objectStoreNames.contains('actors')) {
-                    db.createObjectStore('actors', { keyPath: 'id' });
-                }
-                if (!db.objectStoreNames.contains('users')) {
-                    db.createObjectStore('users', { keyPath: 'id' });
-                }
-                if (!db.objectStoreNames.contains('settings')) {
-                    db.createObjectStore('settings', { keyPath: 'key' });
-                }
-            }
-        });
-
-        await this.seedIfNeeded();
+        // No-op for Firestore, but we can check if it's ready
+        console.log("Database Module Loaded using Firestore");
     },
 
-    async seedIfNeeded() {
-        // ... (existing seed code if any)
+    handleError(error, operationType, path) {
+        const errInfo = {
+            error: error instanceof Error ? error.message : String(error),
+            authInfo: {
+                userId: window.firebaseAuth?.currentUser?.uid,
+                email: window.firebaseAuth?.currentUser?.email,
+                emailVerified: window.firebaseAuth?.currentUser?.emailVerified
+            },
+            operationType,
+            path
+        };
+        console.error('Firestore Error: ', JSON.stringify(errInfo));
+        throw new Error(JSON.stringify(errInfo));
     },
 
     async saveUser(user) {
-        return db.put('users', user);
+        const { doc, setDoc } = window.FirebaseSDK.firestore;
+        const path = `users/${user.id}`;
+        try {
+            await setDoc(doc(window.firebaseDB, path), user);
+        } catch (e) {
+            this.handleError(e, 'write', path);
+        }
     },
 
     async getUsers() {
-        return db.getAll('users');
+        const { collection, getDocs } = window.FirebaseSDK.firestore;
+        const path = 'users';
+        try {
+            const snapshot = await getDocs(collection(window.firebaseDB, path));
+            return snapshot.docs.map(doc => doc.data());
+        } catch (e) {
+            this.handleError(e, 'list', path);
+        }
+    },
+
+    async getUser(id) {
+        const { doc, getDoc } = window.FirebaseSDK.firestore;
+        const path = `users/${id}`;
+        try {
+            const docSnap = await getDoc(doc(window.firebaseDB, path));
+            return docSnap.exists() ? docSnap.data() : null;
+        } catch (e) {
+            this.handleError(e, 'get', path);
+        }
     },
 
     async addLot(lot) {
-        return db.add('lots', lot);
+        const { doc, setDoc } = window.FirebaseSDK.firestore;
+        const path = `lots/${lot.id}`;
+        try {
+            // Ensure timestamp is a Date for Firestore
+            if (lot.timestamp && !(lot.timestamp instanceof Date)) {
+                lot.timestamp = new Date(lot.timestamp);
+            }
+            await setDoc(doc(window.firebaseDB, path), lot);
+        } catch (e) {
+            this.handleError(e, 'write', path);
+        }
     },
 
     async getLot(id) {
-        return db.get('lots', id);
+        const { doc, getDoc } = window.FirebaseSDK.firestore;
+        const path = `lots/${id}`;
+        try {
+            const docSnap = await getDoc(doc(window.firebaseDB, path));
+            if (docSnap.exists()) {
+                const data = docSnap.data();
+                // Convert Firestore Timestamp to Date
+                if (data.timestamp && data.timestamp.toDate) data.timestamp = data.timestamp.toDate();
+                return data;
+            }
+            return null;
+        } catch (e) {
+            this.handleError(e, 'get', path);
+        }
     },
 
     async updateLot(lot) {
-        return db.put('lots', lot);
+        const { doc, updateDoc } = window.FirebaseSDK.firestore;
+        const path = `lots/${lot.id}`;
+        try {
+            const updateData = { ...lot };
+            delete updateData.id; // Usually ID is immutable in path
+            await updateDoc(doc(window.firebaseDB, path), updateData);
+        } catch (e) {
+            this.handleError(e, 'update', path);
+        }
     },
 
     async getAllLots() {
-        return db.getAll('lots');
+        const { collection, getDocs, query, orderBy } = window.FirebaseSDK.firestore;
+        const path = 'lots';
+        try {
+            const q = query(collection(window.firebaseDB, path), orderBy('timestamp', 'desc'));
+            const snapshot = await getDocs(q);
+            return snapshot.docs.map(doc => {
+                const data = doc.data();
+                if (data.timestamp && data.timestamp.toDate) data.timestamp = data.timestamp.toDate();
+                return data;
+            });
+        } catch (e) {
+            this.handleError(e, 'list', path);
+        }
     },
 
     async addTransfer(transfer) {
-        return db.add('transfers', transfer);
+        const { collection, addDoc, serverTimestamp } = window.FirebaseSDK.firestore;
+        const path = `lots/${transfer.lotId}/transfers`;
+        try {
+            await addDoc(collection(window.firebaseDB, path), {
+                ...transfer,
+                timestamp: serverTimestamp()
+            });
+        } catch (e) {
+            this.handleError(e, 'write', path);
+        }
     },
 
     async getTransfersByLot(lotId) {
-        return db.getAllFromIndex('transfers', 'by-lot', lotId);
+        const { collection, getDocs, query, orderBy } = window.FirebaseSDK.firestore;
+        const path = `lots/${lotId}/transfers`;
+        try {
+            const q = query(collection(window.firebaseDB, path), orderBy('timestamp', 'asc'));
+            const snapshot = await getDocs(q);
+            return snapshot.docs.map(doc => {
+                const data = doc.data();
+                if (data.timestamp && data.timestamp.toDate) data.timestamp = data.timestamp.toDate();
+                return data;
+            });
+        } catch (e) {
+            this.handleError(e, 'list', path);
+        }
     }
 };

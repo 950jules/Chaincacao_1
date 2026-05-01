@@ -1,58 +1,87 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Helper functions
-    function isSignedIn() { return request.auth != null; }
-    function isValidId(id) { return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-\\(\\).]+$'); }
-    function incoming() { return request.resource.data; }
-    function existing() { return resource.data; }
-    
-    // Default deny
+    // 0. Default Deny
     match /{document=**} {
       allow read, write: if false;
     }
 
-    // User profiles
-    match /users/{userId} {
-      allow read: if isSignedIn();
-      allow write: if isSignedIn(); // We rely on logic for now, but in production this should be uid == userId
+    // 3. Primitives & Helpers
+    function isSignedIn() { return request.auth != null; }
+    function incoming() { return request.resource.data; }
+    function existing() { return resource.data; }
+
+    function getUserId(auth) {
+      return auth.token.email.split("@")[0].upper();
+    }
+    
+    function getUserRole(userId) {
+      return get(/databases/$(database)/documents/users/$(userId)).data.role;
     }
 
-    // Lots
-    match /lots/{lotId} {
-      // Publicly readable for verification
-      allow get: if isValidId(lotId);
-      allow list: if true; // In a production app, we'd limit this, but here we need to find lot by ID
-      
-      allow create: if isSignedIn() && isValidLot(incoming());
-      allow update: if isSignedIn() && (
-        (incoming().status != existing().status && incoming().diff(existing()).affectedKeys().hasOnly(['status']))
-      );
+    function isValidUser(data) {
+      return data.keys().hasAll(['id', 'role', 'lastname', 'firstname', 'phone']) &&
+             data.id is string && data.role in ['AGR', 'COOP', 'EXP', 'VER'] &&
+             data.lastname is string && data.lastname.size() <= 100 &&
+             data.firstname is string && data.firstname.size() <= 100 &&
+             data.phone is string && data.phone.size() <= 20;
     }
 
-    // Transfers
-    match /transfers/{transferId} {
-      // Publicly readable for verification when searching by lotId
-      allow get: if isValidId(transferId);
-      allow list: if true;
-
-      allow create: if isSignedIn() && isValidTransfer(incoming()) && exists(/databases/$(database)/documents/lots/$(incoming().lotId));
-    }
-
-    // Validation functions
     function isValidLot(data) {
-      return data.keys().hasAll(['id', 'weight', 'region', 'gps', 'farmerId', 'status', 'createdAt'])
-        && data.id is string
-        && data.weight is number
-        && data.status in ['initial', 'validated', 'exported', 'arrived']
-        && data.createdAt is string;
+      return data.keys().hasAll(['id', 'farmerId', 'timestamp', 'weight', 'status']) &&
+             data.id is string && data.farmerId is string &&
+             data.weight is number && data.weight > 0 &&
+             data.status in ['CREATED', 'COLLECTED', 'EXPORTED'];
     }
 
-    function isValidTransfer(data) {
-      return data.keys().hasAll(['id', 'lotId', 'actorId', 'status', 'timestamp', 'txHash'])
-        && data.id is string
-        && data.lotId is string
-        && data.txHash is string;
+    // 1. Users
+    match /users/{userId} {
+      allow get: if isSignedIn();
+      allow list: if false;
+      allow create: if isSignedIn() && 
+                    request.auth.token.email == userId.lower() + "@chaincacao.tg" &&
+                    isValidUser(incoming());
+      allow update: if isSignedIn() && 
+                    request.auth.token.email == userId.lower() + "@chaincacao.tg" &&
+                    isValidUser(incoming()) &&
+                    incoming().role == existing().role;
+    }
+
+    // 2. Lots
+    match /lots/{lotId} {
+      allow get: if isSignedIn();
+      allow list: if isSignedIn();
+      
+      allow create: if isSignedIn() && 
+                    getUserRole(getUserId(request.auth)) == 'AGR' &&
+                    incoming().farmerId.upper() == getUserId(request.auth) &&
+                    incoming().status == 'CREATED' &&
+                    isValidLot(incoming());
+
+      allow update: if isSignedIn() && (
+        // Action: Collect (Coop)
+        (getUserRole(getUserId(request.auth)) == 'COOP' && 
+         existing().status == 'CREATED' &&
+         incoming().status == 'COLLECTED' &&
+         incoming().diff(existing()).affectedKeys().hasOnly(['status', 'officialWeight', 'qualityGrade', 'coopId'])) ||
+        
+        // Action: Export (Exportateur)
+        (getUserRole(getUserId(request.auth)) == 'EXP' && 
+         existing().status == 'COLLECTED' &&
+         incoming().status == 'EXPORTED' &&
+         incoming().diff(existing()).affectedKeys().hasOnly(['status', 'exportManifestId']))
+      ) && isValidLot(incoming());
+      
+      allow delete: if false;
+    }
+
+    // 3. Transfers
+    match /lots/{lotId}/transfers/{transferId} {
+      allow read: if isSignedIn();
+      allow create: if isSignedIn() && 
+                    (getUserRole(getUserId(request.auth)) in ['AGR', 'COOP', 'EXP']) &&
+                    incoming().actorId.upper() == getUserId(request.auth) &&
+                    incoming().lotId == lotId;
     }
   }
 }
