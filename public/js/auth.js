@@ -68,6 +68,7 @@ const auth = {
                             <option value="Kpévé">Kpévé</option>
                             <option value="Atakpamé">Atakpamé</option>
                             <option value="Badou">Badou</option>
+                            <option value="Amlamé">Amlamé</option>
                         </select>
                     </div>
                     <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px">
@@ -84,7 +85,11 @@ const auth = {
                         <label>Mot de passe (min 8 car.)</label>
                         <input type="password" id="reg-pass" placeholder="••••••••">
                     </div>
-                    <button class="btn btn-primary" onclick="auth.register()">S'INSCRIRE</button>
+                    <div class="input-group">
+                        <label>Confirmer le mot de passe</label>
+                        <input type="password" id="reg-pass-confirm" placeholder="••••••••">
+                    </div>
+                    <button class="btn btn-primary" onclick="auth.register()" style="margin-top:10px">S'INSCRIRE</button>
                 </div>
             </div>
         `;
@@ -121,9 +126,11 @@ const auth = {
         const age = document.getElementById('reg-age').value;
         const phone = document.getElementById('reg-phone').value;
         const pass = document.getElementById('reg-pass').value;
+        const passConfirm = document.getElementById('reg-pass-confirm').value;
 
         if (!phone || phone.length < 8) return alert("Numéro de téléphone invalide");
         if (pass.length < 8) return alert("Le mot de passe doit faire au moins 8 caractères");
+        if (pass !== passConfirm) return alert("Les mots de passe ne correspondent pas");
 
         const userId = `${role}-${phone}`;
         const newUser = {
