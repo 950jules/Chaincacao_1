@@ -1,5 +1,5 @@
 const DB_NAME = 'ChainCacaoDB';
-const DB_VERSION = 2;
+const DB_VERSION = 3;
 
 let db;
 
@@ -59,6 +59,10 @@ const database = {
 
     async addTransfer(transfer) {
         return db.add('transfers', transfer);
+    },
+
+    async getAllTransfers() {
+        return db.getAll('transfers');
     },
 
     async getTransfersByLot(lotId) {

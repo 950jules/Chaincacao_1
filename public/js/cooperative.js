@@ -223,7 +223,7 @@ const cooperative = {
 
     async renderHistory() {
         const user = JSON.parse(localStorage.getItem('chaincacao_user')) || { id: 'COOP-001' };
-        const transfers = await idb.openDB(DB_NAME, DB_VERSION).then(db => db.getAll('transfers'));
+        const transfers = await database.getAllTransfers();
         const coopTransfers = transfers.filter(t => t.actorId === user.id).reverse();
         
         const container = document.getElementById('cooperative-history');
