@@ -1,0 +1,215 @@
+.welcome-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.welcome-header h2 {
+    font-size: 1.5rem;
+    font-weight: 900;
+    color: var(--primary);
+    margin: 0;
+    letter-spacing: -0.03em;
+}
+
+.welcome-header small {
+    color: var(--secondary);
+    font-weight: 600;
+}
+
+.location-badge {
+    width: 40px;
+    height: 40px;
+    background: rgba(45, 90, 39, 0.2);
+    color: var(--success);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.status-horizontal-band {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 20px;
+}
+
+.status-mini {
+    padding: 10px;
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid rgba(0,0,0,0.05);
+}
+
+.status-mini.yellow { background: #FFF9C4; color: #D35400; }
+.status-mini.green { background: rgba(45, 90, 39, 0.15); color: var(--success); }
+.status-mini.red { background: #FFCDD2; color: var(--danger); }
+
+.status-mini .val { font-weight: 900; font-size: 1.1rem; }
+.status-mini .lbl { font-size: 7px; font-weight: 800; opacity: 0.8; }
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.stat-item {
+    background: var(--bg-card);
+    padding: 1.25rem;
+    border-radius: var(--border-radius);
+    text-align: left;
+    box-shadow: var(--shadow);
+    border: 1px solid var(--border);
+}
+
+body.dark-mode .stat-item .v { color: var(--text-main); }
+body.dark-mode .welcome-header h2 { color: var(--text-main); }
+
+.urgent-card {
+    background: #FFEDE1;
+    border: 2px solid #D35400 !important;
+    padding: 1rem;
+    margin: 1.5rem 0;
+    animation: pulse-border 2s infinite;
+}
+
+body.dark-mode .urgent-card {
+    background: rgba(211, 84, 0, 0.1);
+    border-color: #E67E22 !important;
+}
+
+.urgent-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #D35400;
+}
+
+body.dark-mode .urgent-header {
+    color: #E67E22;
+}
+
+.input-mini {
+    width: 100%;
+    height: 32px;
+    border-radius: 8px;
+    border: 1px solid rgba(0,0,0,0.1);
+    font-size: 0.75rem;
+    padding: 0 8px;
+    background: white;
+}
+
+body.dark-mode .input-mini {
+    background: var(--bg-card);
+    color: var(--text-main);
+    border-color: var(--border);
+}
+
+@keyframes pulse-border {
+    0% { border-color: #D35400; }
+    50% { border-color: rgba(211, 84, 0, 0.3); }
+    100% { border-color: #D35400; }
+}
+
+/* Form Styles */
+.form-step h3 {
+    font-family: var(--font-heading);
+    font-size: 1.2rem;
+    font-weight: 800;
+    margin-bottom: 1rem;
+    color: var(--primary);
+    letter-spacing: -0.02em;
+}
+
+.input-group {
+    margin-bottom: 1.25rem;
+}
+
+.input-group label {
+    display: block;
+    font-family: var(--font-heading);
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: var(--secondary);
+    margin-bottom: 0.6rem;
+    letter-spacing: 0.05em;
+}
+
+.input-group input, .input-group select, .input-group textarea {
+    width: 100%;
+    padding: 0.9rem;
+    background: var(--white);
+    border: 1.5px solid rgba(61, 26, 10, 0.1);
+    border-radius: 14px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--primary);
+    font-family: var(--font-body);
+    transition: all 0.2s;
+}
+
+.input-group input:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 4px rgba(61, 26, 10, 0.05);
+}
+
+.photo-preview {
+    width: 100%;
+    height: 280px;
+    background: rgba(61, 27, 11, 0.03);
+    border-radius: 24px;
+    border: 2px dashed rgba(61, 27, 11, 0.15);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    margin-bottom: 1.5rem;
+}
+
+.gps-box {
+    background: var(--white);
+    padding: 1.25rem;
+    border-radius: 16px;
+    border: none;
+    box-shadow: var(--shadow);
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    font-weight: 600;
+    margin-bottom: 2rem;
+    color: var(--secondary);
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.gps-box::before {
+    content: '📍';
+}
+
+.action-bar {
+    display: flex;
+    gap: 0.75rem;
+    margin-top: 2rem;
+}
+
+.qr-result {
+    text-align: center;
+    padding: 2.5rem 0;
+}
+
+#qrcode-display {
+    display: inline-block;
+    padding: 1.5rem;
+    background: white;
+    border-radius: 20px;
+    box-shadow: var(--shadow);
+}

@@ -1,0 +1,115 @@
+/* Validation Error Styles */
+
+.error-field {
+    border-color: #C0392B !important;
+    background-color: rgba(192, 57, 43, 0.05);
+}
+
+.dark-mode .error-field {
+    background-color: rgba(192, 57, 43, 0.15);
+}
+
+.field-error {
+    display: none;
+    font-size: 0.75rem;
+    color: #C0392B;
+    font-weight: 600;
+    margin-top: 0.25rem;
+    animation: slideIn 0.2s ease;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-4px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Input validation feedback */
+input:invalid,
+select:invalid {
+    border-color: #FFA500;
+}
+
+input:valid:not(:placeholder-shown),
+select:valid:not(:placeholder-shown) {
+    border-color: var(--success);
+    background-image: linear-gradient(135deg, transparent 0%, transparent calc(100% - 20px), var(--success) calc(100% - 15px));
+    background-repeat: no-repeat;
+    background-position: right 0.5rem center;
+    background-size: 16px;
+}
+
+/* Form validation summary */
+.validation-summary {
+    background: rgba(192, 57, 43, 0.1);
+    border: 1px solid #C0392B;
+    border-radius: 12px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    display: none;
+}
+
+.validation-summary.show {
+    display: block;
+    animation: slideIn 0.3s ease;
+}
+
+.validation-summary h4 {
+    color: #C0392B;
+    font-size: 0.9rem;
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.validation-summary ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.validation-summary li {
+    font-size: 0.8rem;
+    color: #C0392B;
+    padding: 0.25rem 0;
+}
+
+.validation-summary li::before {
+    content: "• ";
+    margin-right: 0.5rem;
+}
+
+/* Success feedback */
+.validation-success {
+    background: rgba(45, 90, 27, 0.1);
+    border: 1px solid var(--success);
+    border-radius: 12px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    display: none;
+    animation: slideIn 0.3s ease;
+}
+
+.validation-success.show {
+    display: block;
+}
+
+.validation-success h4 {
+    color: var(--success);
+    font-size: 0.9rem;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.validation-success h4::before {
+    content: "✓ ";
+    font-weight: bold;
+}

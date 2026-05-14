@@ -1,0 +1,77 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "User profile and role information",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "role": { "type": "string", "enum": ["AGR", "COOP", "EXP", "VER"] },
+        "lastname": { "type": "string" },
+        "firstname": { "type": "string" },
+        "locality": { "type": "string" },
+        "age": { "type": "string" },
+        "phone": { "type": "string" },
+        "cooperative": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "role", "lastname", "firstname", "phone"]
+    },
+    "Lot": {
+      "title": "Lot",
+      "description": "Cacao lot information",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "farmerId": { "type": "string" },
+        "farmerName": { "type": "string" },
+        "timestamp": { "type": "string", "format": "date-time" },
+        "weight": { "type": "number" },
+        "species": { "type": "string" },
+        "region": { "type": "string" },
+        "gps": {
+          "type": "object",
+          "properties": {
+            "lat": { "type": "number" },
+            "lng": { "type": "number" }
+          }
+        },
+        "photo": { "type": "string" },
+        "status": { "type": "string", "enum": ["CREATED", "COLLECTED", "EXPORTED"] },
+        "officialWeight": { "type": "number" },
+        "qualityGrade": { "type": "string" },
+        "coopId": { "type": "string" },
+        "exportManifestId": { "type": "string" }
+      },
+      "required": ["id", "farmerId", "timestamp", "weight", "status"]
+    },
+    "Transfer": {
+      "title": "Transfer",
+      "description": "Blockchain transaction and transfer records",
+      "type": "object",
+      "properties": {
+        "lotId": { "type": "string" },
+        "actorId": { "type": "string" },
+        "type": { "type": "string" },
+        "timestamp": { "type": "string", "format": "date-time" },
+        "hash": { "type": "string" },
+        "data": { "type": "object" }
+      },
+      "required": ["lotId", "actorId", "type", "timestamp", "hash"]
+    }
+  },
+  "firestore": {
+    "users/{userId}": {
+      "schema": "User",
+      "description": "User profiles"
+    },
+    "lots/{lotId}": {
+      "schema": "Lot",
+      "description": "Cacao lots"
+    },
+    "lots/{lotId}/transfers/{transferId}": {
+      "schema": "Transfer",
+      "description": "Transfer history for a specific lot"
+    }
+  }
+}

@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ChainCacao - Traçabilité Transparente</title>
+    <meta name="theme-color" content="#3D1B0B">
+    <link rel="manifest" href="./manifest.json">
+    <link rel="apple-touch-icon" href="https://i.ibb.co/LzN9V0L/cacao-icon.png">
+
+    <!-- Splash Screen Styles -->
+    <style>
+        #splash-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #FDF8F3;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 99999;
+            transition: opacity 0.5s;
+        }
+        .splash-logo {
+            width: 80px;
+            height: 80px;
+            background: #3D1B0B;
+            border-radius: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(61,27,11,0.2);
+            color: white;
+        }
+        .splash-loader {
+            width: 40px;
+            height: 4px;
+            background: #F5F1EB;
+            border-radius: 2px;
+            overflow: hidden;
+            position: relative;
+        }
+        .splash-loader::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: #3D1B0B;
+            animation: loading 1.5s infinite;
+        }
+        @keyframes loading {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+        body.loaded #splash-screen {
+            opacity: 0;
+            pointer-events: none;
+        }
+    </style>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Sora:wght@100..800&display=swap" rel="stylesheet">
+    
+    <!-- CDNs -->
+    <script type="importmap">
+    {
+      "imports": {
+        "firebase/app": "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js",
+        "firebase/auth": "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js",
+        "firebase/firestore": "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js"
+      }
+    }
+    </script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/idb@8/build/umd.js" defer></script>
+    <script src="https://unpkg.com/html5-qrcode" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" defer></script>
+    <script src="https://unpkg.com/lucide@latest" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/motion/dist/motion.js" defer></script>
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="./css/style.css">
+    <link rel="stylesheet" href="./css/auth.css">
+    <link rel="stylesheet" href="./css/gps.css">
+    <link rel="stylesheet" href="./css/agriculteur.css">
+    <link rel="stylesheet" href="./css/cooperative.css">
+    <link rel="stylesheet" href="./css/exportateur.css">
+    <link rel="stylesheet" href="./css/verificateur.css">
+    <link rel="stylesheet" href="./css/analytics.css">
+    <link rel="stylesheet" href="./css/validation.css">
+    
+    <script>
+        // Garantie que showToast est toujours définie
+        if (typeof window.showToast !== 'function') {
+            window.showToast = function(msg, type) {
+                console.log(`[Loading Fallback] ${type}: ${msg}`);
+                if (type === 'error') alert(msg);
+            };
+        }
+    </script>
+</head>
+<body>
+    <div id="splash-screen">
+        <div class="splash-logo" style="overflow:hidden">
+            <img src="https://i.ibb.co/LzN9V0L/cacao-icon.png" alt="ChainCacao" style="width:100%; height:100%; object-fit:contain; filter:brightness(0) invert(1); padding:10px">
+        </div>
+        <div class="splash-loader"></div>
+    </div>
+    <div id="app">
+        <!-- Header -->
+        <header class="app-header">
+            <div class="logo">
+                <div class="logo-icon-box" style="background:var(--primary); overflow:hidden; border: 2px solid rgba(255,255,255,0.1)">
+                    <img src="https://i.ibb.co/LzN9V0L/cacao-icon.png" alt="C" style="width:100%; height:100%; object-fit:contain; filter:brightness(0) invert(1); padding:4px">
+                </div>
+                <div class="logo-text">
+                    <h1>ChainCacao</h1>
+                    <div class="logo-tagline">Traçabilité Blockchain Togolaise</div>
+                </div>
+            </div>
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <button id="theme-toggle" class="user-badge" onclick="themeManager.toggle()" title="Changer le thème">🌙</button>
+                <div id="user-info" class="user-badge" onclick="auth.logout()">
+                <div id="user-display-container">
+                    <span id="user-id-display">Invité</span>
+                </div>
+                <i data-lucide="log-out" style="width:16px; margin-left:8px"></i>
+                <button id="install-btn" style="display:none">PWA</button>
+            </div>
+        </header>
+
+        <!-- Main Content (Containers) -->
+        <main id="main-content">
+            <!-- Skeleton Loader (affiché pendant les chargements) -->
+            <div id="skeleton-loader" class="hidden">
+                <div class="skeleton skeleton-title"></div>
+                <div class="skeleton skeleton-card"></div>
+                <div class="skeleton skeleton-card"></div>
+                <div class="skeleton skeleton-btn"></div>
+            </div>
+            
+            <!-- Dashboard Analytics -->
+            <section id="screen-analytics" class="screen hidden">
+                <span class="section-label">📊 Tableau de Bord</span>
+                <div id="analytics-dashboard"></div>
+            </section>
+            
+            <!-- Écran Agriculteur -->
+            <section id="screen-agriculteur" class="screen hidden">
+                <span class="section-label">01. Agriculteur</span>
+                <div id="agriculteur-dashboard"></div>
+                <div id="agriculteur-form-container" class="hidden"></div>
+            </section>
+
+            <!-- Écran Coopérative -->
+            <section id="screen-cooperative" class="screen hidden">
+                <span class="section-label">02. Coopérative</span>
+                <div id="cooperative-scanner"></div>
+                <div id="cooperative-details" class="hidden"></div>
+                <div id="cooperative-history"></div>
+            </section>
+
+            <!-- Écran Exportateur -->
+            <section id="screen-exportateur" class="screen hidden">
+                <span class="section-label">03. Exportateur</span>
+                <div id="exportateur-dashboard"></div>
+                <div id="exportateur-arrival-list"></div>
+            </section>
+
+            <!-- Écran Vérificateur -->
+            <section id="screen-verificateur" class="screen hidden">
+                <span class="section-label">04. Vérificateur</span>
+                <div class="search-box">
+                    <input type="text" id="verify-input" placeholder="ID Lot...">
+                    <button id="btn-verify">
+                        <i data-lucide="search" style="width:18px; height:18px"></i>
+                    </button>
+                </div>
+                <div id="verifier-result" class="hidden"></div>
+            </section>
+        </main>
+
+        <!-- Navigation -->
+        <nav class="app-nav">
+            <button class="nav-item" data-screen="agriculteur">
+                <span class="icon"><i data-lucide="tractor"></i></span>
+                <span class="label">Récolte</span>
+            </button>
+            <button class="nav-item" data-screen="cooperative">
+                <span class="icon"><i data-lucide="factory"></i></span>
+                <span class="label">Collecte</span>
+            </button>
+            <button class="nav-item" data-screen="exportateur">
+                <span class="icon"><i data-lucide="truck"></i></span>
+                <span class="label">Export</span>
+            </button>
+            <button class="nav-item" data-screen="verificateur">
+                <span class="icon"><i data-lucide="shield-check"></i></span>
+                <span class="label">VÉRIFICATEUR</span>
+            </button>
+        </nav>
+
+        <!-- Modals / Overlays -->
+        <div id="modal-container" class="modal-overlay hidden">
+            <div class="modal-content">
+                <button class="close-modal">&times;</button>
+                <div id="modal-body"></div>
+            </div>
+        </div>
+
+        <!-- Offline Banner -->
+        <div id="offline-banner" class="hidden">Mode hors-ligne activé. Les données seront synchronisées plus tard.</div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
+    <script src="./js/abi.js"></script>
+
+
+    <!-- App core scripts (order matters) -->
+    <script src="./js/utils.js"></script>
+    <script src="./js/theme.js"></script>
+    <script src="./js/toast.js"></script>
+
+    <!-- Firebase init and database must load before auth -->
+    <script src="./js/firebase-init.js"></script>
+    <script src="./js/database.js"></script>
+
+    <!-- App features -->
+    <script src="./js/auth.js"></script>
+    <script src="./js/blockchain.js"></script>
+    <script src="./js/offline.js"></script>
+    <script src="./js/camera.js"></script>
+    <script src="./js/gps.js"></script>
+    <script src="./js/qrcode.js"></script>
+    <script src="./js/pdf.js"></script>
+
+    <!-- Role modules -->
+    <script src="./js/agriculteur.js"></script>
+    <script src="./js/cooperative.js"></script>
+    <script src="./js/exportateur.js"></script>
+    <script src="./js/verificateur.js"></script>
+    <script src="./js/analytics.js"></script>
+    <script src="./js/validation.js"></script>
+
+    <!-- App bootstrap -->
+    <script src="./js/app.js"></script>
+    
+    <script>
+        window.addEventListener('load', () => {
+            console.log("Window loaded, initializing app...");
+            if (typeof app !== 'undefined') {
+                app.init();
+            } else {
+                console.error("App object not found!");
+            }
+        });
+    </script>
+</body>
+</html>

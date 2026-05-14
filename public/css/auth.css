@@ -1,0 +1,121 @@
+#auth-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(61, 27, 11, 0.4);
+    backdrop-filter: blur(8px);
+    display: flex;
+    justify-content: center;
+    z-index: 100000;
+    padding: 40px 20px; /* More vertical padding for breathing room */
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+.auth-card {
+    background: var(--bg-card);
+    width: 100%;
+    max-width: 420px;
+    padding: 1.25rem 1rem;
+    border-radius: 28px;
+    box-shadow: 0 30px 60px rgba(0,0,0,0.3);
+    border: 1px solid var(--border);
+    margin: 1rem auto; /* Allow scrolling from top and bottom */
+}
+
+.auth-header {
+    text-align: center;
+    margin-bottom: 1.25rem;
+}
+
+.auth-header .logo-box {
+    width: 48px;
+    height: 48px;
+    background: var(--primary);
+    color: white;
+    font-size: 24px;
+    font-weight: 800;
+    margin: 0 auto 0.75rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 14px;
+}
+
+.auth-header h1 {
+    font-family: var(--font-heading);
+    font-size: 1.25rem;
+    font-weight: 800;
+    color: var(--primary);
+    margin: 0;
+}
+
+.auth-header p {
+    font-size: 0.75rem;
+    color: var(--secondary);
+    font-weight: 600;
+}
+
+.auth-tabs {
+    display: flex;
+    background: var(--gray);
+    padding: 4px;
+    border-radius: 16px;
+    margin-bottom: 1.5rem;
+}
+
+.auth-tabs button {
+    flex: 1;
+    padding: 10px;
+    border: none;
+    background: transparent;
+    border-radius: 12px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--secondary);
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.auth-tabs button.active {
+    background: var(--bg-card);
+    color: var(--text-main);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+.auth-form .input-group {
+    margin-bottom: 0.6rem;
+}
+
+.auth-form label {
+    display: block;
+    font-size: 0.7rem;
+    font-weight: 800;
+    color: var(--text-secondary);
+    margin-bottom: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.auth-form input, .auth-form select {
+    width: 100%;
+    padding: 10px 14px;
+    border-radius: 12px;
+    border: 2px solid var(--border);
+    background: var(--bg-card);
+    color: var(--text-main);
+    font-size: 0.85rem;
+    font-family: inherit;
+    transition: all 0.2s;
+}
+
+.auth-form input:focus {
+    outline: none;
+    border-color: var(--primary);
+}
+
+.blurred {
+    filter: blur(10px);
+}
